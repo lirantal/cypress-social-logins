@@ -1,3 +1,20 @@
+<p align="center"><h1 align="center">
+  cypress-social-logins
+</h1>
+
+<p align="center">
+  cypress authentication flows using social network providers
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.org/package/cypress-social-logins"><img src="https://badgen.net/npm/v/cypress-social-logins "alt="npm version"/></a>
+  <a href="https://www.npmjs.org/package/cypress-social-logins"><img src="https://badgen.net/npm/license/cypress-social-logins "alt="license"/></a>
+  <a href="https://www.npmjs.org/package/cypress-social-logins"><img src="https://badgen.net/npm/dt/cypress-social-logins "alt="downloads"/></a>
+  <a href="https://travis-ci.org/lirantal/cypress-social-logins"><img src="https://badgen.net/travis/lirantal/cypress-social-logins" alt="build"/></a>
+  <a href="https://snyk.io/test/github/lirantal/cypress-social-logins"><img src="https://snyk.io/test/github/lirantal/cypress-social-logins/badge.svg" alt="Known Vulnerabilities"/></a>
+</p>
+
+
 # About
 
 This Cypress library makes it possible to perform third-party logins (think oauth) for services such as GitHub, Google or Facebook.
