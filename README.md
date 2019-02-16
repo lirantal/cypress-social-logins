@@ -39,10 +39,10 @@ Supported identity providers:
 2. Set the cookies for the test flow with the help of `Cypress.Cookies.defaults`
 
 ```js
-cy.clearCookies();
+cy.clearCookies()
 
-return cy.task("GoogleSocialLogin", socialLoginOptions).then(({ cookies }) => {
-  const cookie = cookies.filter(cookie => cookie.name === cookieName).pop();
+return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
+  const cookie = cookies.filter(cookie => cookie.name === cookieName).pop()
   if (cookie) {
     cy.setCookie(cookie.name, cookie.value, {
       domain: cookie.domain,
@@ -50,13 +50,13 @@ return cy.task("GoogleSocialLogin", socialLoginOptions).then(({ cookies }) => {
       httpOnly: cookie.httpOnly,
       path: cookie.path,
       secure: cookie.secure
-    });
+    })
 
     Cypress.Cookies.defaults({
       whitelist: cookieName
-    });
+    })
   }
-});
+})
 ```
 
 Options passed to the task include:
@@ -88,13 +88,13 @@ login.
 Example:
 
 ```js
-const { GoogleSocialLogin } = require("cypress-social-logins").plugins;
+const {GoogleSocialLogin} = require('cypress-social-logins').plugins
 
 module.exports = (on, config) => {
-  on("task", {
+  on('task', {
     GoogleSocialLogin: GoogleSocialLogin
-  });
-};
+  })
+}
 ```
 
 ## Using the social login
@@ -110,46 +110,42 @@ sessions in the test flow, hence the example code showing the case for
 `Cypress.Cookies.defaults`.
 
 ```js
-describe("Login", () => {
-  it("Login through Google", () => {
-    const username = Cypress.env("googleSocialLoginUsername");
-    const password = Cypress.env("googleSocialLoginPassword");
+describe('Login', () => {
+  it('Login through Google', () => {
+    const username = Cypress.env('googleSocialLoginUsername')
+    const password = Cypress.env('googleSocialLoginPassword')
 
-    const cookieName = Cypress.env("cookieName");
+    const cookieName = Cypress.env('cookieName')
     const socialLoginOptions = {
       username,
       password,
-      loginUrl: Cypress.env("loginUrl"),
+      loginUrl: Cypress.env('loginUrl'),
       headless: true,
       logs: false,
       loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
-      postLoginSelector: ".account-panel"
-    };
+      postLoginSelector: '.account-panel'
+    }
 
-    return cy
-      .task("GoogleSocialLogin", socialLoginOptions)
-      .then(({ cookies }) => {
-        cy.clearCookies();
+    return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
+      cy.clearCookies()
 
-        const cookie = cookies
-          .filter(cookie => cookie.name === cookieName)
-          .pop();
-        if (cookie) {
-          cy.setCookie(cookie.name, cookie.value, {
-            domain: cookie.domain,
-            expiry: cookie.expires,
-            httpOnly: cookie.httpOnly,
-            path: cookie.path,
-            secure: cookie.secure
-          });
+      const cookie = cookies.filter(cookie => cookie.name === cookieName).pop()
+      if (cookie) {
+        cy.setCookie(cookie.name, cookie.value, {
+          domain: cookie.domain,
+          expiry: cookie.expires,
+          httpOnly: cookie.httpOnly,
+          path: cookie.path,
+          secure: cookie.secure
+        })
 
-          Cypress.Cookies.defaults({
-            whitelist: cookieName
-          });
-        }
-      });
-  });
-});
+        Cypress.Cookies.defaults({
+          whitelist: cookieName
+        })
+      }
+    })
+  })
+})
 ```
 
 # Author

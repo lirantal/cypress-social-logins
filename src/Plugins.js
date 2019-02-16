@@ -1,10 +1,10 @@
 'use strict'
 
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer')
 
 /**
- * 
- * @param {options.username} string username 
+ *
+ * @param {options.username} string username
  * @param {options.password} string password
  * @param {options.loginUrl} string password
  * @param {options.loginSelector} string a selector on the loginUrl page for the social provider button
@@ -15,24 +15,23 @@ const puppeteer = require('puppeteer');
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   validateOptions(options)
 
-  const browser = await puppeteer.launch({ headless: !!options.headless })
+  const browser = await puppeteer.launch({headless: !!options.headless})
   const page = await browser.newPage()
-  await page.setViewport({ width: 1280, height: 800 })
+  await page.setViewport({width: 1280, height: 800})
 
   await page.goto(options.loginUrl)
 
-  await login({ page, options })
-  await typeUsername({ page, options })
-  await typePassword({ page, options })
+  await login({page, options})
+  await typeUsername({page, options})
+  await typePassword({page, options})
 
-  const cookies = await getCookies({ page, options })
-  
-  await finalizeSession({ page, browser, options })
+  const cookies = await getCookies({page, options})
+
+  await finalizeSession({page, browser, options})
 
   return {
     cookies
   }
-
 }
 
 function validateOptions(options) {
@@ -41,25 +40,25 @@ function validateOptions(options) {
   }
 }
 
-async function login({ page, options } = {}) {
+async function login({page, options} = {}) {
   await page.waitForSelector(options.loginSelector)
   await page.click(options.loginSelector)
 }
 
-async function typeUsername({ page, options } = {}) {
+async function typeUsername({page, options} = {}) {
   await page.waitForSelector('input[type="email"]')
   await page.type('input[type="email"]', options.username)
   await page.click('#identifierNext')
 }
 
-async function typePassword({ page, options } = {}) {
-  await page.waitForSelector('input[type="password"]', { visible: true })
-  await page.type('input[type="password"]', options.password)  
-  await page.waitForSelector('#passwordNext', { visible: true })
+async function typePassword({page, options} = {}) {
+  await page.waitForSelector('input[type="password"]', {visible: true})
+  await page.type('input[type="password"]', options.password)
+  await page.waitForSelector('#passwordNext', {visible: true})
   await page.click('#passwordNext')
 }
 
-async function getCookies({ page, options } = {}) {
+async function getCookies({page, options} = {}) {
   const cookies = await page.cookies(options.loginUrl)
   if (options.logs) {
     console.log(cookies)
@@ -68,10 +67,10 @@ async function getCookies({ page, options } = {}) {
   return cookies
 }
 
-async function finalizeSession({ page, browser, options } = {}) {
+async function finalizeSession({page, browser, options} = {}) {
   if (options.postLoginSelector) {
-    await page.waitForSelector(options.postLoginSelector)  
+    await page.waitForSelector(options.postLoginSelector)
   }
-  
+
   await browser.close()
 }
