@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier-standard '**/*.js'",
-    "test": "jest",
+    "test": "exit 0",
     "test:watch": "jest --watch",
     "coverage:view": "opn coverage/lcov-report/index.html",
     "commit": "git-cz",
@@ -29,13 +29,13 @@
     "social",
     "logins"
   ],
-  "homepage": "https://github.com/lirantal/create-node-lib",
+  "homepage": "https://github.com/lirantal/cypress-social-logins",
   "bugs": {
-    "url": "https://github.com/lirantal/create-node-lib/issues"
+    "url": "https://github.com/lirantal/cypress-social-logins/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lirantal/create-node-lib.git"
+    "url": "https://github.com/lirantal/cypress-social-logins.git"
   },
   "dependencies": {
     "puppeteer": "^1.10.0"
