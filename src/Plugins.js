@@ -59,6 +59,8 @@ async function typePassword({page, options} = {}) {
 }
 
 async function getCookies({page, options} = {}) {
+  await page.waitForSelector(options.postLoginSelector)
+  
   const cookies = await page.cookies(options.loginUrl)
   if (options.logs) {
     console.log(cookies)
@@ -68,9 +70,5 @@ async function getCookies({page, options} = {}) {
 }
 
 async function finalizeSession({page, browser, options} = {}) {
-  if (options.postLoginSelector) {
-    await page.waitForSelector(options.postLoginSelector)
-  }
-
   await browser.close()
 }
