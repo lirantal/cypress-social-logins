@@ -60,7 +60,7 @@ async function typePassword({page, options} = {}) {
 
 async function getCookies({page, options} = {}) {
   await page.waitForSelector(options.postLoginSelector)
-  
+
   const cookies = await page.cookies(options.loginUrl)
   if (options.logs) {
     console.log(cookies)
