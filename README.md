@@ -148,6 +148,19 @@ describe('Login', () => {
 })
 ```
 
+# Troubleshooting
+
+## Timeout while trying to enter username
+
+Make sure you are providing the plugin with the username or password in the options when instantiating it. If you're passing it via environment variables then the plugin will look for these two: `CYPRESS_googleSocialLoginUsername` and `CYPRESS_googleSocialLoginPassword`
+
+
+## Login via popups won't work
+
+If clicking on the login button via the selector you passed opens up the login process in a pop-up or somewhere else that is not available in a direct DOM navigation of the current window then this plugin will not be able to know about it and click there to complete the login process.
+
+See this issue for more context: https://github.com/lirantal/cypress-social-logins/issues/4
+
 # Author
 
 Liran Tal <liran.tal@gmail.com>
