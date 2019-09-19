@@ -11,6 +11,7 @@ const puppeteer = require('puppeteer')
  * @param {options.postLoginSelector} string a selector on the app's post-login return page to assert that login is successful
  * @param {options.headless} boolean launch puppeteer in headless more or not
  * @param {options.logs} boolean whether to log cookies and other metadata to console
+ * @param {options.getAllBrowserCookies} boolean whether to get all browser cookies instead of just for the loginUrl
  */
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   validateOptions(options)
@@ -61,12 +62,20 @@ async function typePassword({page, options} = {}) {
 async function getCookies({page, options} = {}) {
   await page.waitForSelector(options.postLoginSelector)
 
-  const cookies = await page.cookies(options.loginUrl)
+  const cookies = options.getAllBrowserCookies
+    ? await getCookiesForAllDomains(page)
+    : await page.cookies(options.loginUrl)
+
   if (options.logs) {
     console.log(cookies)
   }
 
   return cookies
+}
+
+async function getCookiesForAllDomains(page) {
+  const cookies = await page._client.send('Network.getAllCookies', {})
+  return cookies.cookies
 }
 
 async function finalizeSession({page, browser, options} = {}) {
