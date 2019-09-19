@@ -61,15 +61,16 @@ return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
 
 Options passed to the task include:
 
-| Option name       | Description                                                                                                           | Example                                 |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| username          |                                                                                                                       |
-| password          |                                                                                                                       |
-| loginUrl          | The URL for the login page that includes the social network buttons                                                   | https://www.example.com/login           |
-| headless          | Whether to run puppeteer in headless more or not                                                                      | true                                    |
-| logs              | Whether to log interaction with the loginUrl website & cookie data                                                    | false                                   |
-| loginSelector     | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link | `'a[href="/auth/auth0/google-oauth2"]'` |
-| postLoginSelector | A selector on the post-login page that can be asserted upon to confirm a successful login                             | `'.account-panel'`                      |
+| Option name          | Description                                                                                                           | Example                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| username             |                                                                                                                       |
+| password             |                                                                                                                       |
+| loginUrl             | The URL for the login page that includes the social network buttons                                                   | https://www.example.com/login           |
+| headless             | Whether to run puppeteer in headless more or not                                                                      | true                                    |
+| logs                 | Whether to log interaction with the loginUrl website & cookie data                                                    | false                                   |
+| loginSelector        | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link | `'a[href="/auth/auth0/google-oauth2"]'` |
+| postLoginSelector    | A selector on the post-login page that can be asserted upon to confirm a successful login                             | `'.account-panel'`                      |
+| getAllBrowserCookies | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                   | true                                    |
 
 ## Install
 
@@ -153,7 +154,6 @@ describe('Login', () => {
 ## Timeout while trying to enter username
 
 Make sure you are providing the plugin with the username or password in the options when instantiating it. If you're passing it via environment variables then the plugin will look for these two: `CYPRESS_googleSocialLoginUsername` and `CYPRESS_googleSocialLoginPassword`
-
 
 ## Login via popups won't work
 
