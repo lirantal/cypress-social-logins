@@ -14,7 +14,9 @@
     "test:watch": "jest --watch",
     "coverage:view": "opn coverage/lcov-report/index.html",
     "commit": "git-cz",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "author": {
     "name": "Liran Tal",
@@ -38,7 +40,8 @@
     "url": "https://github.com/lirantal/cypress-social-logins.git"
   },
   "dependencies": {
-    "puppeteer": "^1.20.0"
+    "puppeteer": "^1.20.0",
+    "snyk": "^1.230.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.2.1",
@@ -193,5 +196,6 @@
         }
       ]
     }
-  }
+  },
+  "snyk": true
 }
