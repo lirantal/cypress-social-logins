@@ -61,16 +61,18 @@ return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
 
 Options passed to the task include:
 
-| Option name          | Description                                                                                                           | Example                                 |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| username             |                                                                                                                       |
-| password             |                                                                                                                       |
-| loginUrl             | The URL for the login page that includes the social network buttons                                                   | https://www.example.com/login           |
-| headless             | Whether to run puppeteer in headless more or not                                                                      | true                                    |
-| logs                 | Whether to log interaction with the loginUrl website & cookie data                                                    | false                                   |
-| loginSelector        | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link | `'a[href="/auth/auth0/google-oauth2"]'` |
-| postLoginSelector    | A selector on the post-login page that can be asserted upon to confirm a successful login                             | `'.account-panel'`                      |
-| getAllBrowserCookies | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                   | true                                    |
+| Option name          | Description                                                                                                                       | Example                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| username             |                                                                                                                                   |
+| password             |                                                                                                                                   |
+| loginUrl             | The URL for the login page that includes the social network buttons                                                               | https://www.example.com/login           |
+| headless             | Whether to run puppeteer in headless more or not                                                                                  | true                                    |
+| logs                 | Whether to log interaction with the loginUrl website & cookie data                                                                | false                                   |
+| loginSelector        | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link             | `'a[href="/auth/auth0/google-oauth2"]'` |
+| postLoginSelector    | A selector on the post-login page that can be asserted upon to confirm a successful login                                         | `'.account-panel'`                      |
+| preLoginSelector     | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`              |
+| loginSelectorDelay   | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                   |
+| getAllBrowserCookies | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                    |
 
 ## Install
 
