@@ -65,16 +65,22 @@ async function login({page, options} = {}) {
 }
 
 async function typeUsername({page, options} = {}) {
+  const found = (await page.content()).includes('One account. All of Google.')
+  const nextButton = found ? '#next' : '#identifierNext'
+
   await page.waitForSelector('input[type="email"]')
   await page.type('input[type="email"]', options.username)
-  await page.click('#identifierNext')
+  await page.click(nextButton)
 }
 
 async function typePassword({page, options} = {}) {
+  const found = (await page.content()).includes('One account. All of Google.')
+  const signInButton = found ? '#signIn' : '#passwordNext'
+
   await page.waitForSelector('input[type="password"]', {visible: true})
   await page.type('input[type="password"]', options.password)
-  await page.waitForSelector('#passwordNext', {visible: true})
-  await page.click('#passwordNext')
+  await page.waitForSelector(signInButton, {visible: true})
+  await page.click(signInButton)
 }
 
 async function getCookies({page, options} = {}) {
