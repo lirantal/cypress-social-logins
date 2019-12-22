@@ -117,12 +117,12 @@ describe('Login', () => {
   it('Login through Google', () => {
     const username = Cypress.env('googleSocialLoginUsername')
     const password = Cypress.env('googleSocialLoginPassword')
-
-    const cookieName = Cypress.env('cookieName')
+    const loginUrl = Cypress.env('loginUrl')
+    const cookieName = Cypress.env('cookieName') 
     const socialLoginOptions = {
       username,
       password,
-      loginUrl: Cypress.env('loginUrl'),
+      loginUrl,
       headless: true,
       logs: false,
       loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
