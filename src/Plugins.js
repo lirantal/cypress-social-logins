@@ -18,7 +18,10 @@ const puppeteer = require('puppeteer')
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   validateOptions(options)
 
-  const browser = await puppeteer.launch({headless: !!options.headless, args: ['--no-sandbox']})
+  const browser = await puppeteer.launch({
+    headless: !!options.headless,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  })
   const page = await browser.newPage()
   await page.setViewport({width: 1280, height: 800})
 
