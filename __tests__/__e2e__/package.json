@@ -12,5 +12,8 @@
   "license": "ISC",
   "devDependencies": {
     "cypress": "^3.1.5"
+  },
+  "dependencies": {
+    "cypress-social-logins": "^1.2.1"
   }
 }

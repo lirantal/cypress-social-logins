@@ -77,9 +77,15 @@ jobs:
           name: install
           command: |
             cd __tests__/__e2e__
+            npm install
             npm install cypress-social-logins --save --verbose
-      - cypress/run:
-          working_directory: __tests__/__e2e__
+      - run:
+          name: cypress-run
+          command: npm run test:e2e
+
+  # TODO: skip cyprss as orb
+  #      - cypress/run:
+  #          working_directory: __tests__/__e2e__
 
   release:
     working_directory: ~/project
