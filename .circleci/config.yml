@@ -80,7 +80,7 @@ jobs:
             cd __tests__/__e2e__
             npm install
             npm install cypress-social-logins --save --verbose
-      - cypress/run:
+      - cypress:
           working_directory: __tests__/__e2e__
 
   # - run:
