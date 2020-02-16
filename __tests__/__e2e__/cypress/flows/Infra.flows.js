@@ -12,7 +12,7 @@ export const login = ({
         username,
         password,
         loginUrl: Cypress.env('loginUrl'),
-        headless: false,
+        headless: true,
         logs: false,
         loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
         postLoginSelector: '.account-panel'
