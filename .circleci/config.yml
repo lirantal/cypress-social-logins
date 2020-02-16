@@ -55,7 +55,7 @@ jobs:
   test-e2e:
     working_directory: ~/project
     docker:
-      - image: circleci/node:12
+      - image: cypress/base:12.14.0
       - image: verdaccio/verdaccio:4
     steps:
       - checkout
@@ -80,15 +80,11 @@ jobs:
             cd __tests__/__e2e__
             npm install
             npm install cypress-social-logins --save --verbose
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - __tests__/__e2e__
-  # - run:
-  #     name: cypress-run
-  #     command: |
-  #       cd __tests__/__e2e__
-  #       npm run test:e2e
+      - run:
+          name: cypress-run
+          command: |
+            cd __tests__/__e2e__
+            npm run test:e2e
 
   release:
     working_directory: ~/project
@@ -113,10 +109,10 @@ workflows:
       - test-e2e:
           requires:
             - lint
-      - cypress/run:
-          working_directory: __tests__/__e2e__
-          requires:
-            - test-e2e
+      # - cypress/run:
+      #     working_directory: __tests__/__e2e__
+      #     requires:
+      #       - test-e2e
       - release:
           filters:
             branches:
