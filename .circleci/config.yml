@@ -80,9 +80,10 @@ jobs:
             cd __tests__/__e2e__
             npm install
             npm install cypress-social-logins --save --verbose
-      - cypress:
-          working_directory: __tests__/__e2e__
-
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - __tests__/__e2e__
   # - run:
   #     name: cypress-run
   #     command: |
@@ -112,6 +113,10 @@ workflows:
       - test-e2e:
           requires:
             - lint
+      - cypress/run:
+          working_directory: __tests__/__e2e__
+          requires:
+            - test-e2e
       - release:
           filters:
             branches:
