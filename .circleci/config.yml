@@ -1,4 +1,5 @@
 version: 2.1
+
 orbs:
   cypress: cypress-io/cypress@1.15.0
 
@@ -81,7 +82,9 @@ jobs:
             npm install cypress-social-logins --save --verbose
       - run:
           name: cypress-run
-          command: npm run test:e2e
+          command: |
+            cd __tests__/__e2e__
+            npm run test:e2e
 
   # TODO: skip cyprss as orb
   #      - cypress/run:
