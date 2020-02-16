@@ -1,0 +1,13 @@
+{
+  "baseUrl": "https://app.snyk.io",
+  "env": {
+    "cookieName": "snyk.id",
+    "//googleSocialLoginUsername": "__SET_IN_CI_ENVIRONMENT_VARIABLE__",
+    "//googleSocialLoginPassword": "__SET_IN_CI_ENVIRONMENT_VARIABLE__",
+    "loginUrl": "https://app.snyk.io/login",
+    "homepage": "https://www.snyk.io"
+  },
+  "blacklistHosts": ["www.google-analytics.com"],
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0",
+  "chromeWebSecurity": false
+}

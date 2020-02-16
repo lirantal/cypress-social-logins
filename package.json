@@ -127,7 +127,8 @@
   },
   "eslintIgnore": [
     "coverage/**",
-    "template/**"
+    "template/**",
+    "__tests__/__e2e__/**"
   ],
   "eslintConfig": {
     "env": {

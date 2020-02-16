@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  cypress: cypress-io/cypress@1.14.0
+
 jobs:
   build:
     working_directory: ~/project
@@ -48,6 +51,36 @@ jobs:
   #         name: coverage
   #         command: npx codecov
 
+  test-e2e:
+    working_directory: ~/project
+    docker:
+      - image: circleci/node:12
+      - image: verdaccio/verdaccio:4
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: npm-verbosity
+          command: npm config set loglevel verbose
+      - run:
+          name: npm-set-registry
+          command: npm set registry http://0.0.0.0:4873
+      - run:
+          name: create-registry-user
+          command: |
+            curl -X PUT http://0.0.0.0:4873/-/user/org.couchdb.user:liran -H "Content-Type: application/json" -d '{"name":"liran","password":"liran","email":"liran@example.com","type":"user"}' | node -pe 'JSON.parse(fs.readFileSync(0)).token' | xargs npm config set _authToken
+      - run:
+          name: npm-publish
+          command: npm publish --verbose
+      - run:
+          name: install
+          command: |
+            cd __tests__/__e2e__
+            npm install cypress-social-logins --save --verbose
+      - cypress/run:
+          working_directory: __tests__/__e2e__
+
   release:
     working_directory: ~/project
     docker:
@@ -68,10 +101,13 @@ workflows:
       - lint:
           requires:
             - build
+      - test-e2e:
+          requires:
+            - lint
       - release:
           filters:
             branches:
               only:
                 - master
           requires:
-            - lint
+            - test-e2e
