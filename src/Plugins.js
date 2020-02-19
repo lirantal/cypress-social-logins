@@ -14,19 +14,48 @@ const puppeteer = require('puppeteer')
  * @param {options.headless} boolean launch puppeteer in headless more or not
  * @param {options.logs} boolean whether to log cookies and other metadata to console
  * @param {options.getAllBrowserCookies} boolean whether to get all browser cookies instead of just for the loginUrl
+ * @param {options.isPopup} boolean is your google auth displayed like a popup
+ * @param {options.popupDelay} number delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely
+ * @param {options.cookieDelay} number delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
+ *
  */
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   validateOptions(options)
 
   const browser = await puppeteer.launch({ headless: !!options.headless })
-  const page = await browser.newPage()
+  let page = await browser.newPage();
+  let originalPageIndex = 1;
   await page.setViewport({ width: 1280, height: 800 })
 
   await page.goto(options.loginUrl)
-
   await login({ page, options })
+
+  // Switch to Popup Window
+  if(options.isPopup){
+    if(options.popupDelay){
+      await delay(options.popupDelay)
+    }
+    const pages = await browser.pages();
+    // remember original window index
+    originalPageIndex = pages.indexOf(pages.find(p => page._target._targetId === p._target._targetId ))
+    page = pages[pages.length - 1]
+  }
+
   await typeUsername({ page, options })
   await typePassword({ page, options })
+
+  // Switch back to Original Window
+  if(options.isPopup) {
+    if(options.popupDelay){
+      await delay(options.popupDelay)
+    }
+    const pages = await browser.pages()
+    page = pages[originalPageIndex];
+  }
+
+  if(options.cookieDelay){
+    await delay(options.cookieDelay);
+  }
 
   const cookies = await getCookies({ page, options })
 
@@ -37,6 +66,12 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
   }
 }
 
+function delay (time) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, time)
+  })
+}
+
 function validateOptions(options) {
   if (!options.username || !options.password) {
     throw new Error('Username or Password missing for social login')
@@ -44,11 +79,6 @@ function validateOptions(options) {
 }
 
 async function login({ page, options } = {}) {
-  const delay = time => {
-    return new Promise(function (resolve) {
-      setTimeout(resolve, time)
-    })
-  }
 
   if (options.preLoginSelector) {
     await page.waitForSelector(options.preLoginSelector)
@@ -85,8 +115,8 @@ async function getCookies({ page, options } = {}) {
   await page.waitForSelector(options.postLoginSelector)
 
   const cookies = options.getAllBrowserCookies
-    ? await getCookiesForAllDomains(page)
-    : await page.cookies(options.loginUrl)
+      ? await getCookiesForAllDomains(page)
+      : await page.cookies(options.loginUrl)
 
   if (options.logs) {
     console.log(cookies)
