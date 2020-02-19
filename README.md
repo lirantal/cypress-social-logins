@@ -73,6 +73,9 @@ Options passed to the task include:
 | preLoginSelector     | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`              |
 | loginSelectorDelay   | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                   |
 | getAllBrowserCookies | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                    |
+| isPopup              | boolean is your google auth displayed like a popup                                                                                | true                                    |
+| popupDelay           | number delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely      | 2000                                    |
+| cookieDelay          | number delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null,undefined,'') to avoid completely         | 100                                     |
 
 ## Install
 

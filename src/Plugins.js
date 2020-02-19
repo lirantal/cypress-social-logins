@@ -15,8 +15,8 @@ const puppeteer = require('puppeteer')
  * @param {options.logs} boolean whether to log cookies and other metadata to console
  * @param {options.getAllBrowserCookies} boolean whether to get all browser cookies instead of just for the loginUrl
  * @param {options.isPopup} boolean is your google auth displayed like a popup
- * @param {options.popupDelay} number delay a specific amount of miliseconds before popup is shown. Pass a falsy (false,zero,null,undefind,'') to avoid completely.
- * @param {options.cookieDelay} number delay a specific amount of miliseconds before get a cookies. Pass a falsy (false,zero,null,undefind,'') to avoid completely.
+ * @param {options.popupDelay} number delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely
+ * @param {options.cookieDelay} number delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
  *
  */
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
