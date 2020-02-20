@@ -22,52 +22,54 @@ const puppeteer = require('puppeteer')
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   validateOptions(options)
 
-  const browser = await puppeteer.launch({ headless: !!options.headless })
-  let page = await browser.newPage();
-  let originalPageIndex = 1;
-  await page.setViewport({ width: 1280, height: 800 })
+  const browser = await puppeteer.launch({headless: !!options.headless})
+  let page = await browser.newPage()
+  let originalPageIndex = 1
+  await page.setViewport({width: 1280, height: 800})
 
   await page.goto(options.loginUrl)
-  await login({ page, options })
+  await login({page, options})
 
   // Switch to Popup Window
-  if(options.isPopup){
-    if(options.popupDelay){
-      await delay(options.popupDelay)
-    }
-    const pages = await browser.pages();
-    // remember original window index
-    originalPageIndex = pages.indexOf(pages.find(p => page._target._targetId === p._target._targetId ))
-    page = pages[pages.length - 1]
-  }
-
-  await typeUsername({ page, options })
-  await typePassword({ page, options })
-
-  // Switch back to Original Window
-  if(options.isPopup) {
-    if(options.popupDelay){
+  if (options.isPopup) {
+    if (options.popupDelay) {
       await delay(options.popupDelay)
     }
     const pages = await browser.pages()
-    page = pages[originalPageIndex];
+    // remember original window index
+    originalPageIndex = pages.indexOf(
+      pages.find(p => page._target._targetId === p._target._targetId)
+    )
+    page = pages[pages.length - 1]
   }
 
-  if(options.cookieDelay){
-    await delay(options.cookieDelay);
+  await typeUsername({page, options})
+  await typePassword({page, options})
+
+  // Switch back to Original Window
+  if (options.isPopup) {
+    if (options.popupDelay) {
+      await delay(options.popupDelay)
+    }
+    const pages = await browser.pages()
+    page = pages[originalPageIndex]
   }
 
-  const cookies = await getCookies({ page, options })
+  if (options.cookieDelay) {
+    await delay(options.cookieDelay)
+  }
 
-  await finalizeSession({ page, browser, options })
+  const cookies = await getCookies({page, options})
+
+  await finalizeSession({page, browser, options})
 
   return {
     cookies
   }
 }
 
-function delay (time) {
-  return new Promise(function (resolve) {
+function delay(time) {
+  return new Promise(function(resolve) {
     setTimeout(resolve, time)
   })
 }
@@ -78,8 +80,7 @@ function validateOptions(options) {
   }
 }
 
-async function login({ page, options } = {}) {
-
+async function login({page, options} = {}) {
   if (options.preLoginSelector) {
     await page.waitForSelector(options.preLoginSelector)
     await page.click(options.preLoginSelector)
@@ -94,7 +95,7 @@ async function login({ page, options } = {}) {
   await page.click(options.loginSelector)
 }
 
-async function typeUsername({ page, options } = {}) {
+async function typeUsername({page, options} = {}) {
   let buttonSelector = options.headless ? '#next' : '#identifierNext'
 
   await page.waitForSelector('input[type="email"]')
@@ -102,21 +103,21 @@ async function typeUsername({ page, options } = {}) {
   await page.click(buttonSelector)
 }
 
-async function typePassword({ page, options } = {}) {
+async function typePassword({page, options} = {}) {
   let buttonSelector = options.headless ? '#signIn' : '#passwordNext'
 
-  await page.waitForSelector('input[type="password"]', { visible: true })
+  await page.waitForSelector('input[type="password"]', {visible: true})
   await page.type('input[type="password"]', options.password)
-  await page.waitForSelector(buttonSelector, { visible: true })
+  await page.waitForSelector(buttonSelector, {visible: true})
   await page.click(buttonSelector)
 }
 
-async function getCookies({ page, options } = {}) {
+async function getCookies({page, options} = {}) {
   await page.waitForSelector(options.postLoginSelector)
 
   const cookies = options.getAllBrowserCookies
-      ? await getCookiesForAllDomains(page)
-      : await page.cookies(options.loginUrl)
+    ? await getCookiesForAllDomains(page)
+    : await page.cookies(options.loginUrl)
 
   if (options.logs) {
     console.log(cookies)
@@ -130,6 +131,6 @@ async function getCookiesForAllDomains(page) {
   return cookies.cookies
 }
 
-async function finalizeSession({ page, browser, options } = {}) {
+async function finalizeSession({page, browser, options} = {}) {
   await browser.close()
 }
