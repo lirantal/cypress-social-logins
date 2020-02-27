@@ -38,7 +38,7 @@
     "url": "https://github.com/lirantal/cypress-social-logins.git"
   },
   "dependencies": {
-    "puppeteer": "^2.1.0"
+    "puppeteer": "^2.1.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.2.1",
