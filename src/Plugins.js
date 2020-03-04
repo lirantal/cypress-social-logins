@@ -7,7 +7,7 @@ const puppeteer = require('puppeteer')
  * @param {options.username} string username
  * @param {options.password} string password
  * @param {options.loginUrl} string password
- * @param {options.args} array[string] string array wich allow you to provide a arguments to puppeteer
+ * @param {options.args} array[string] string array which allows providing further arguments to puppeteer
  * @param {options.loginSelector} string a selector on the loginUrl page for the social provider button
  * @param {options.loginSelectorDelay} number delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely.
  * @param {options.postLoginSelector} string a selector on the app's post-login return page to assert that login is successful
