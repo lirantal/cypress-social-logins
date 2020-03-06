@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier-standard '**/*.js'",
-    "test": "cypress run",
+    "test": "cypress run --record --key $CYPRESS_DASH_KEY",
     "test:watch": "jest --watch",
     "coverage:view": "opn coverage/lcov-report/index.html",
     "commit": "git-cz",

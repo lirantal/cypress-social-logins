@@ -18,8 +18,8 @@ lib-cov
 coverage
 
 # Ignore cypress files
-cypress/screenshots/*
-cypress/videos/*
+cypress/screenshots
+cypress/videos
 
 # nyc test coverage
 .nyc_output
