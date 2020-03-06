@@ -73,6 +73,7 @@ workflows:
           requires:
             - build
       - cypress/run:
+          record: true
           requires:
             - lint
       - release:
