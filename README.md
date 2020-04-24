@@ -167,6 +167,17 @@ If clicking on the login button via the selector you passed opens up the login p
 
 See this issue for more context: https://github.com/lirantal/cypress-social-logins/issues/4
 
+## Failed to launch the browser process
+
+If you're getting an error on a Linux server such as:
+```
+Error: Failed to launch the browser process!
+[768:768:0423/165641.025850:ERROR:zygote_host_impl_linux.cc(89)] Running as root without --no-sandbox is not supported. See https://crbug.com/638180.
+TROUBLESHOOTING:
+```
+
+You should pass the argument `--no-sanbox` to the plugin as extra arguments.
+
 # Author
 
 Liran Tal <liran.tal@gmail.com>
