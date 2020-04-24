@@ -13,7 +13,8 @@ export const login = ({
         logs: false,
         loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
         postLoginSelector: '.account-panel',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+//         args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox']
       }
 
       return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
