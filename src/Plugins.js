@@ -111,12 +111,12 @@ async function typeUsername({page, options} = {}) {
 }
 
 async function typePassword({page, options} = {}) {
-  let buttonSelector = options.headless ? '#signIn' : '#passwordNext'
 
   await page.waitForSelector('input[type="password"]', {visible: true})
   await page.type('input[type="password"]', options.password)
-  await page.waitForSelector(buttonSelector, {visible: true})
-  await page.click(buttonSelector)
+ 
+  // send ENTER key
+  await page.keyboard.press(String.fromCharCode(13))
 }
 
 async function getCookies({page, options} = {}) {
