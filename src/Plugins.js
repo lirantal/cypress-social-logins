@@ -111,10 +111,9 @@ async function typeUsername({page, options} = {}) {
 }
 
 async function typePassword({page, options} = {}) {
-
   await page.waitForSelector('input[type="password"]', {visible: true})
   await page.type('input[type="password"]', options.password)
- 
+
   // send ENTER key
   await page.keyboard.press(String.fromCharCode(13))
 }
