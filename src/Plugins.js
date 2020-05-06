@@ -68,11 +68,11 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
 
   const cookies = await getCookies({ page, options });
   const lsd = await getLocalStorageData({ page, options });
-
+  const ssd = await getSessionStorageData({ page, options });
   await finalizeSession({ page, browser, options })
 
   return {
-    cookies, lsd
+    cookies, lsd, ssd
   }
 }
 
@@ -152,6 +152,23 @@ async function getLocalStorageData({ page, options } = {}) {
   return localStorageData
 }
 
+async function getSessionStorageData({ page, options } = {}) {
+  await page.waitForSelector(options.postLoginSelector)
+
+  const sessionStorageData = await page.evaluate(() => {
+    let json = {};
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      json[key] = sessionStorage.getItem(key);
+    }
+    return json;
+  });
+  if (options.logs) {
+    console.log(sessionStorageData)
+  }
+
+  return sessionStorageData
+}
 
 async function getCookiesForAllDomains(page) {
   const cookies = await page._client.send('Network.getAllCookies', {})
