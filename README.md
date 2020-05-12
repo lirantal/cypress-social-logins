@@ -170,7 +170,7 @@ Error: Failed to launch the browser process!
 TROUBLESHOOTING:
 ```
 
-You should pass the argument `--no-sanbox` to the plugin as extra arguments.
+You should pass the argument `--no-sandbox` to the plugin as extra arguments.
 
 # Author
 
