@@ -161,6 +161,8 @@ describe('Login', () => {
 
 Make sure you are providing the plugin with the username or password in the options when instantiating it. If you're passing it via environment variables then the plugin will look for these two: `CYPRESS_googleSocialLoginUsername` and `CYPRESS_googleSocialLoginPassword`
 
+If your application uses popup auth, make sure you are providing `isPopup: true` configuration parameter.
+
 ## Failed to launch the browser process
 
 If you're getting an error on a Linux server such as:
