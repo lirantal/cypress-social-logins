@@ -37,11 +37,12 @@ Supported identity providers:
 
 1. Call the declared task with a set of options for the social login flow interaction
 2. Set the cookies for the test flow with the help of `Cypress.Cookies.defaults`
+3. Copy over all or some (or none) of the local & session storage objects from puppeteer to local instance
 
 ```js
 cy.clearCookies()
 
-return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
+return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies,lsd,ssd}) => {
   const cookie = cookies.filter(cookie => cookie.name === cookieName).pop()
   if (cookie) {
     cy.setCookie(cookie.name, cookie.value, {
@@ -56,6 +57,17 @@ return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
       whitelist: cookieName
     })
   }
+ 
+  // ssd contains session storage data (window.sessionStorage)
+  // lsd contains local storage data (window.localStorage)
+
+  cy.window().then(window => {
+      Object.keys(ssd).forEach(key => window.sessionStorage.setItem(key, ssd[key]));
+      Object.keys(lsd).forEach(key => window.sessionStorage.setItem(key, ssd[key]));
+  });
+  
+
+
 })
 ```
 
