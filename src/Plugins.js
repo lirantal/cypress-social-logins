@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 'use strict'
 
 const puppeteer = require('puppeteer')
@@ -23,7 +24,7 @@ const puppeteer = require('puppeteer')
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   validateOptions(options)
 
-  const launchOptions = { headless: !!options.headless }
+  const launchOptions = {headless: !!options.headless}
 
   if (options.args && options.args.length) {
     launchOptions.args = options.args
@@ -32,10 +33,10 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
   const browser = await puppeteer.launch(launchOptions)
   let page = await browser.newPage()
   let originalPageIndex = 1
-  await page.setViewport({ width: 1280, height: 800 })
+  await page.setViewport({width: 1280, height: 800})
 
   await page.goto(options.loginUrl)
-  await login({ page, options })
+  await login({page, options})
 
   // Switch to Popup Window
   if (options.isPopup) {
@@ -50,8 +51,8 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
     page = pages[pages.length - 1]
   }
 
-  await typeUsername({ page, options })
-  await typePassword({ page, options })
+  await typeUsername({page, options})
+  await typePassword({page, options})
 
   // Switch back to Original Window
   if (options.isPopup) {
@@ -66,18 +67,20 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
     await delay(options.cookieDelay)
   }
 
-  const cookies = await getCookies({ page, options });
-  const lsd = await getLocalStorageData({ page, options });
-  const ssd = await getSessionStorageData({ page, options });
-  await finalizeSession({ page, browser, options })
+  const cookies = await getCookies({page, options})
+  const lsd = await getLocalStorageData({page, options})
+  const ssd = await getSessionStorageData({page, options})
+  await finalizeSession({page, browser, options})
 
   return {
-    cookies, lsd, ssd
+    cookies,
+    lsd,
+    ssd
   }
 }
 
 function delay(time) {
-  return new Promise(function (resolve) {
+  return new Promise(function(resolve) {
     setTimeout(resolve, time)
   })
 }
@@ -88,7 +91,7 @@ function validateOptions(options) {
   }
 }
 
-async function login({ page, options } = {}) {
+async function login({page, options} = {}) {
   if (options.preLoginSelector) {
     await page.waitForSelector(options.preLoginSelector)
     await page.click(options.preLoginSelector)
@@ -103,7 +106,7 @@ async function login({ page, options } = {}) {
   await page.click(options.loginSelector)
 }
 
-async function typeUsername({ page, options } = {}) {
+async function typeUsername({page, options} = {}) {
   let buttonSelector = options.headless ? '#next' : '#identifierNext'
 
   await page.waitForSelector('input[type="email"]')
@@ -111,18 +114,17 @@ async function typeUsername({ page, options } = {}) {
   await page.click(buttonSelector)
 }
 
-
 async function typePassword({page, options} = {}) {
   let buttonSelectors = ['#signIn', '#passwordNext', '#submit']
 
-  await page.waitForSelector('input[type="password"]', { visible: true })
+  await page.waitForSelector('input[type="password"]', {visible: true})
   await page.type('input[type="password"]', options.password)
 
   const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
   await page.click(buttonSelector)
 }
 
-async function getCookies({ page, options } = {}) {
+async function getCookies({page, options} = {}) {
   await page.waitForSelector(options.postLoginSelector)
 
   const cookies = options.getAllBrowserCookies
@@ -136,17 +138,17 @@ async function getCookies({ page, options } = {}) {
   return cookies
 }
 
-async function getLocalStorageData({ page, options } = {}) {
+async function getLocalStorageData({page, options} = {}) {
   await page.waitForSelector(options.postLoginSelector)
 
   const localStorageData = await page.evaluate(() => {
-    let json = {};
+    let json = {}
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      json[key] = localStorage.getItem(key);
+      const key = localStorage.key(i)
+      json[key] = localStorage.getItem(key)
     }
-    return json;
-  });
+    return json
+  })
   if (options.logs) {
     console.log(localStorageData)
   }
@@ -154,17 +156,17 @@ async function getLocalStorageData({ page, options } = {}) {
   return localStorageData
 }
 
-async function getSessionStorageData({ page, options } = {}) {
+async function getSessionStorageData({page, options} = {}) {
   await page.waitForSelector(options.postLoginSelector)
 
   const sessionStorageData = await page.evaluate(() => {
-    let json = {};
+    let json = {}
     for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      json[key] = sessionStorage.getItem(key);
+      const key = sessionStorage.key(i)
+      json[key] = sessionStorage.getItem(key)
     }
-    return json;
-  });
+    return json
+  })
   if (options.logs) {
     console.log(sessionStorageData)
   }
@@ -177,7 +179,7 @@ async function getCookiesForAllDomains(page) {
   return cookies.cookies
 }
 
-async function finalizeSession({ page, browser, options } = {}) {
+async function finalizeSession({page, browser, options} = {}) {
   await browser.close()
 }
 
