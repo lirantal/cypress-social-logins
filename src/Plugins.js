@@ -111,12 +111,14 @@ async function typeUsername({ page, options } = {}) {
   await page.click(buttonSelector)
 }
 
-async function typePassword({ page, options } = {}) {
-  let buttonSelector = options.headless ? '#signIn' : '#passwordNext'
+
+async function typePassword({page, options} = {}) {
+  let buttonSelectors = ['#signIn', '#passwordNext', '#submit']
 
   await page.waitForSelector('input[type="password"]', { visible: true })
   await page.type('input[type="password"]', options.password)
-  await page.waitForSelector(buttonSelector, { visible: true })
+
+  const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
   await page.click(buttonSelector)
 }
 
@@ -177,4 +179,36 @@ async function getCookiesForAllDomains(page) {
 
 async function finalizeSession({ page, browser, options } = {}) {
   await browser.close()
+}
+
+async function waitForMultipleSelectors(selectors, options, page) {
+  const navigationOutcome = await racePromises(
+    selectors.map(selector => page.waitForSelector(selector, options))
+  )
+  return selectors[parseInt(navigationOutcome)]
+}
+
+async function racePromises(promises) {
+  const wrappedPromises = []
+  let resolved = false
+  promises.map((promise, index) => {
+    wrappedPromises.push(
+      new Promise(resolve => {
+        promise.then(
+          () => {
+            resolve(index)
+          },
+          error => {
+            if (!resolved) {
+              throw error
+            }
+          }
+        )
+      })
+    )
+  })
+  return Promise.race(wrappedPromises).then(index => {
+    resolved = true
+    return index
+  })
 }

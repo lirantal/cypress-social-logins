@@ -79,7 +79,7 @@ Options passed to the task include:
 | password             |                                                                                                                                   |
 | loginUrl             | The URL for the login page that includes the social network buttons                                                               | https://www.example.com/login           |
 | args                 | string array which allows providing further arguments to puppeteer                                                                                  | `['--no-sandbox', '--disable-setuid-sandbox']`|
-| headless             | Whether to run puppeteer in headless more or not                                                                                  | true                                    |
+| headless             | Whether to run puppeteer in headless mode or not                                                                                  | true                                    |
 | logs                 | Whether to log interaction with the loginUrl website & cookie data                                                                | false                                   |
 | loginSelector        | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link             | `'a[href="/auth/auth0/google-oauth2"]'` |
 | postLoginSelector    | A selector on the post-login page that can be asserted upon to confirm a successful login                                         | `'.account-panel'`                      |
@@ -173,6 +173,8 @@ describe('Login', () => {
 
 Make sure you are providing the plugin with the username or password in the options when instantiating it. If you're passing it via environment variables then the plugin will look for these two: `CYPRESS_googleSocialLoginUsername` and `CYPRESS_googleSocialLoginPassword`
 
+If your application uses popup auth, make sure you are providing `isPopup: true` configuration parameter.
+
 ## Failed to launch the browser process
 
 If you're getting an error on a Linux server such as:
@@ -182,7 +184,7 @@ Error: Failed to launch the browser process!
 TROUBLESHOOTING:
 ```
 
-You should pass the argument `--no-sanbox` to the plugin as extra arguments.
+You should pass the argument `--no-sandbox` to the plugin as extra arguments.
 
 # Author
 
