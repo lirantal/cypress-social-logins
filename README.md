@@ -63,7 +63,7 @@ return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies,lsd,ssd})
 
   cy.window().then(window => {
       Object.keys(ssd).forEach(key => window.sessionStorage.setItem(key, ssd[key]));
-      Object.keys(lsd).forEach(key => window.sessionStorage.setItem(key, ssd[key]));
+      Object.keys(lsd).forEach(key => window.sessionStorage.setItem(key, lsd[key]));
   });
   
 
