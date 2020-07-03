@@ -36,21 +36,20 @@ jobs:
           name: lint
           command: npm run lint
 
-  # no tests :(((
-  # test:
-  #   working_directory: ~/project
-  #   docker:
-  #     - image: circleci/node:12
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ./
-  #     - run:
-  #         name: test
-  #         command: npm run test
-  #     - run:
-  #         name: coverage
-  #         command: npx codecov
+  test:
+    working_directory: ~/project
+    docker:
+      - image: circleci/node:8.12.0-browsers
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: test
+          command: npm run test
+      - run:
+          name: coverage
+          command: npx codecov
 
   release:
     working_directory: ~/project
@@ -72,8 +71,9 @@ workflows:
       - lint:
           requires:
             - build
-      - cypress/run:
-          record: true
+#       - cypress/run:
+#           record: true
+      - test:
           requires:
             - lint
       - release:
