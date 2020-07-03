@@ -54,6 +54,8 @@ jobs:
           path: cypress/videos
       - store_artifacts:
           path: cypress/screenshots
+      - store_artifacts:
+          path: debug/
 
   release:
     working_directory: ~/project
