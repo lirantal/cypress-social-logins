@@ -14,7 +14,7 @@ jobs:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: install
-          command: npm install --ignore-engines
+          command: npm ci --ignore-engines
       - save_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
@@ -25,6 +25,7 @@ jobs:
           paths:
             - project/node_modules
             - .cache
+            - cypress/*
 
   lint:
     working_directory: ~/project
