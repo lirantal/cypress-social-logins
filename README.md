@@ -37,11 +37,12 @@ Supported identity providers:
 
 1. Call the declared task with a set of options for the social login flow interaction
 2. Set the cookies for the test flow with the help of `Cypress.Cookies.defaults`
+3. Copy over all or some (or none) of the local & session storage objects from puppeteer to local instance
 
 ```js
 cy.clearCookies()
 
-return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
+return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies,lsd,ssd}) => {
   const cookie = cookies.filter(cookie => cookie.name === cookieName).pop()
   if (cookie) {
     cy.setCookie(cookie.name, cookie.value, {
@@ -56,6 +57,17 @@ return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
       whitelist: cookieName
     })
   }
+ 
+  // ssd contains session storage data (window.sessionStorage)
+  // lsd contains local storage data (window.localStorage)
+
+  cy.window().then(window => {
+      Object.keys(ssd).forEach(key => window.sessionStorage.setItem(key, ssd[key]));
+      Object.keys(lsd).forEach(key => window.localStorage.setItem(key, lsd[key]));
+  });
+  
+
+
 })
 ```
 
@@ -67,7 +79,7 @@ Options passed to the task include:
 | password             |                                                                                                                                   |
 | loginUrl             | The URL for the login page that includes the social network buttons                                                               | https://www.example.com/login           |
 | args                 | string array which allows providing further arguments to puppeteer                                                                                  | `['--no-sandbox', '--disable-setuid-sandbox']`|
-| headless             | Whether to run puppeteer in headless more or not                                                                                  | true                                    |
+| headless             | Whether to run puppeteer in headless mode or not                                                                                  | true                                    |
 | logs                 | Whether to log interaction with the loginUrl website & cookie data                                                                | false                                   |
 | loginSelector        | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link             | `'a[href="/auth/auth0/google-oauth2"]'` |
 | postLoginSelector    | A selector on the post-login page that can be asserted upon to confirm a successful login                                         | `'.account-panel'`                      |
@@ -161,11 +173,18 @@ describe('Login', () => {
 
 Make sure you are providing the plugin with the username or password in the options when instantiating it. If you're passing it via environment variables then the plugin will look for these two: `CYPRESS_googleSocialLoginUsername` and `CYPRESS_googleSocialLoginPassword`
 
-## Login via popups won't work
+If your application uses popup auth, make sure you are providing `isPopup: true` configuration parameter.
 
-If clicking on the login button via the selector you passed opens up the login process in a pop-up or somewhere else that is not available in a direct DOM navigation of the current window then this plugin will not be able to know about it and click there to complete the login process.
+## Failed to launch the browser process
 
-See this issue for more context: https://github.com/lirantal/cypress-social-logins/issues/4
+If you're getting an error on a Linux server such as:
+```
+Error: Failed to launch the browser process!
+[768:768:0423/165641.025850:ERROR:zygote_host_impl_linux.cc(89)] Running as root without --no-sandbox is not supported. See https://crbug.com/638180.
+TROUBLESHOOTING:
+```
+
+You should pass the argument `--no-sandbox` to the plugin as extra arguments.
 
 # Author
 

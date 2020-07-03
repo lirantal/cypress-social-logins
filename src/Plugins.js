@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 'use strict'
 
 const puppeteer = require('puppeteer')
@@ -67,11 +68,14 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
   }
 
   const cookies = await getCookies({page, options})
-
+  const lsd = await getLocalStorageData({page, options})
+  const ssd = await getSessionStorageData({page, options})
   await finalizeSession({page, browser, options})
 
   return {
-    cookies
+    cookies,
+    lsd,
+    ssd
   }
 }
 
@@ -111,11 +115,13 @@ async function typeUsername({page, options} = {}) {
 }
 
 async function typePassword({page, options} = {}) {
+  let buttonSelectors = ['#signIn', '#passwordNext', '#submit']
+
   await page.waitForSelector('input[type="password"]', {visible: true})
   await page.type('input[type="password"]', options.password)
 
-  // send ENTER key
-  await page.keyboard.press(String.fromCharCode(13))
+  const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
+  await page.click(buttonSelector)
 }
 
 async function getCookies({page, options} = {}) {
@@ -132,6 +138,42 @@ async function getCookies({page, options} = {}) {
   return cookies
 }
 
+async function getLocalStorageData({page, options} = {}) {
+  await page.waitForSelector(options.postLoginSelector)
+
+  const localStorageData = await page.evaluate(() => {
+    let json = {}
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      json[key] = localStorage.getItem(key)
+    }
+    return json
+  })
+  if (options.logs) {
+    console.log(localStorageData)
+  }
+
+  return localStorageData
+}
+
+async function getSessionStorageData({page, options} = {}) {
+  await page.waitForSelector(options.postLoginSelector)
+
+  const sessionStorageData = await page.evaluate(() => {
+    let json = {}
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i)
+      json[key] = sessionStorage.getItem(key)
+    }
+    return json
+  })
+  if (options.logs) {
+    console.log(sessionStorageData)
+  }
+
+  return sessionStorageData
+}
+
 async function getCookiesForAllDomains(page) {
   const cookies = await page._client.send('Network.getAllCookies', {})
   return cookies.cookies
@@ -139,4 +181,36 @@ async function getCookiesForAllDomains(page) {
 
 async function finalizeSession({page, browser, options} = {}) {
   await browser.close()
+}
+
+async function waitForMultipleSelectors(selectors, options, page) {
+  const navigationOutcome = await racePromises(
+    selectors.map(selector => page.waitForSelector(selector, options))
+  )
+  return selectors[parseInt(navigationOutcome)]
+}
+
+async function racePromises(promises) {
+  const wrappedPromises = []
+  let resolved = false
+  promises.map((promise, index) => {
+    wrappedPromises.push(
+      new Promise(resolve => {
+        promise.then(
+          () => {
+            resolve(index)
+          },
+          error => {
+            if (!resolved) {
+              throw error
+            }
+          }
+        )
+      })
+    )
+  })
+  return Promise.race(wrappedPromises).then(index => {
+    resolved = true
+    return index
+  })
 }
