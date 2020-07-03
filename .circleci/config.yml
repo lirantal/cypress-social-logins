@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  cypress: cypress-io/cypress@1
-
 jobs:
   build:
     working_directory: ~/project
@@ -74,8 +71,6 @@ workflows:
       - lint:
           requires:
             - build
-#       - cypress/run:
-#           record: true
       - test:
           requires:
             - lint
