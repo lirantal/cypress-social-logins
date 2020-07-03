@@ -159,7 +159,12 @@ async function typePassword({page, options} = {}) {
 }
 
 async function getCookies({page, options} = {}) {
-  await page.waitForSelector(options.postLoginSelector)
+  try {
+    await page.waitForSelector(options.postLoginSelector)
+  } catch (error) {
+    await page.screenshot({path: path.join(screenshotsPath, 'screenshot-postLoginSelector.png')})
+    throw error
+  }
 
   const cookies = options.getAllBrowserCookies
     ? await getCookiesForAllDomains(page)
