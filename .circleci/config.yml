@@ -19,10 +19,12 @@ jobs:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
+            - ~/.cache/Cypress
       - persist_to_workspace:
-          root: ~/project
+          root: ~/
           paths:
-            - ./node_modules
+            - project/node_modules
+            - .cache/Cypress
 
   lint:
     working_directory: ~/project
@@ -31,7 +33,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./
+          at: ~/
       - run:
           name: lint
           command: npm run lint
@@ -43,7 +45,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./
+          at: ~/
       - run:
           name: test
           command: npm run test
@@ -58,7 +60,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./
+          at: ~/
       - run:
           name: release
           command: npm run semantic-release
