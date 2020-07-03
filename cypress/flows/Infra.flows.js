@@ -12,12 +12,13 @@ export const login = ({
         password,
         loginUrl: Cypress.env('loginUrl'),
         headless: true,
-        logs: false,
+        logs: true,
         loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
         postLoginSelector: '.account-panel',
         // args: ['--no-sandbox', '--disable-setuid-sandbox']
         args: ['--no-sandbox'],
-        screenshotsPathWhenFailed: './debug'
+        screenshotsPathWhenFailed: './debug',
+        cookieDelay: 300
       }
 
       return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {

@@ -42,6 +42,9 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
     fs.mkdirSync(screenshotsPath)
   }
 
+  options.screenshotsPath = screenshotsPath
+  console.log(`screenshotsPath set to: ${screenshotsPath}`)
+
   const launchOptions = {headless: !!options.headless}
 
   if (options.args && options.args.length) {
@@ -162,7 +165,9 @@ async function getCookies({page, options} = {}) {
   try {
     await page.waitForSelector(options.postLoginSelector)
   } catch (error) {
-    await page.screenshot({path: path.join(screenshotsPath, 'screenshot-postLoginSelector.png')})
+    await page.screenshot({
+      path: path.join(options.screenshotsPath, 'screenshot-postLoginSelector.png')
+    })
     throw error
   }
 
