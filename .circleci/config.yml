@@ -24,7 +24,7 @@ jobs:
           root: ~/
           paths:
             - project/node_modules
-            - .cache/Cypress
+            - .cache
 
   lint:
     working_directory: ~/project
