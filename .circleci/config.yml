@@ -50,6 +50,10 @@ jobs:
       - run:
           name: coverage
           command: npx codecov
+      - store_artifacts:
+          path: cypress/videos
+      - store_artifacts:
+          path: cypress/screenshots
 
   release:
     working_directory: ~/project
