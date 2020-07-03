@@ -42,8 +42,8 @@ Supported identity providers:
 ```js
 cy.clearCookies()
 
-return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies,lsd,ssd}) => {
-  const cookie = cookies.filter(cookie => cookie.name === cookieName).pop()
+return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies, lsd, ssd}) => {
+  const cookie = cookies.filter((cookie) => cookie.name === cookieName).pop()
   if (cookie) {
     cy.setCookie(cookie.name, cookie.value, {
       domain: cookie.domain,
@@ -57,38 +57,36 @@ return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies,lsd,ssd})
       whitelist: cookieName
     })
   }
- 
+
   // ssd contains session storage data (window.sessionStorage)
   // lsd contains local storage data (window.localStorage)
 
-  cy.window().then(window => {
-      Object.keys(ssd).forEach(key => window.sessionStorage.setItem(key, ssd[key]));
-      Object.keys(lsd).forEach(key => window.localStorage.setItem(key, lsd[key]));
-  });
-  
-
-
+  cy.window().then((window) => {
+    Object.keys(ssd).forEach((key) => window.sessionStorage.setItem(key, ssd[key]))
+    Object.keys(lsd).forEach((key) => window.localStorage.setItem(key, lsd[key]))
+  })
 })
 ```
 
 Options passed to the task include:
 
-| Option name          | Description                                                                                                                       | Example                                 |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| username             |                                                                                                                                   |
-| password             |                                                                                                                                   |
-| loginUrl             | The URL for the login page that includes the social network buttons                                                               | https://www.example.com/login           |
-| args                 | string array which allows providing further arguments to puppeteer                                                                                  | `['--no-sandbox', '--disable-setuid-sandbox']`|
-| headless             | Whether to run puppeteer in headless mode or not                                                                                  | true                                    |
-| logs                 | Whether to log interaction with the loginUrl website & cookie data                                                                | false                                   |
-| loginSelector        | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link             | `'a[href="/auth/auth0/google-oauth2"]'` |
-| postLoginSelector    | A selector on the post-login page that can be asserted upon to confirm a successful login                                         | `'.account-panel'`                      |
-| preLoginSelector     | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`              |
-| loginSelectorDelay   | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                   |
-| getAllBrowserCookies | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                    |
-| isPopup              | boolean, is your google auth displayed like a popup                                                                                | true                                    |
-| popupDelay           | number, delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely      | 2000                                    |
-| cookieDelay          | number, delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null,undefined,'') to avoid completely         | 100                                     |
+| Option name               | Description                                                                                                                       | Example                                        |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| username                  |                                                                                                                                   |
+| password                  |                                                                                                                                   |
+| loginUrl                  | The URL for the login page that includes the social network buttons                                                               | https://www.example.com/login                  |
+| args                      | string array which allows providing further arguments to puppeteer                                                                | `['--no-sandbox', '--disable-setuid-sandbox']` |
+| headless                  | Whether to run puppeteer in headless mode or not                                                                                  | true                                           |
+| logs                      | Whether to log interaction with the loginUrl website & cookie data                                                                | false                                          |
+| loginSelector             | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link             | `'a[href="/auth/auth0/google-oauth2"]'`        |
+| postLoginSelector         | A selector on the post-login page that can be asserted upon to confirm a successful login                                         | `'.account-panel'`                             |
+| preLoginSelector          | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`                     |
+| loginSelectorDelay        | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                          |
+| getAllBrowserCookies      | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                           |
+| isPopup                   | boolean, is your google auth displayed like a popup                                                                               | true                                           |
+| popupDelay                | number, delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely     | 2000                                           |
+| cookieDelay               | number, delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null,undefined,'') to avoid completely        | 100                                            |
+| screenshotsPathWhenFailed | string path to save screenshots for when issues arise with puppeteer's login process                                              | './debug'                                      |
 
 ## Install
 
@@ -148,7 +146,7 @@ describe('Login', () => {
     return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
       cy.clearCookies()
 
-      const cookie = cookies.filter(cookie => cookie.name === cookieName).pop()
+      const cookie = cookies.filter((cookie) => cookie.name === cookieName).pop()
       if (cookie) {
         cy.setCookie(cookie.name, cookie.value, {
           domain: cookie.domain,
@@ -178,6 +176,7 @@ If your application uses popup auth, make sure you are providing `isPopup: true`
 ## Failed to launch the browser process
 
 If you're getting an error on a Linux server such as:
+
 ```
 Error: Failed to launch the browser process!
 [768:768:0423/165641.025850:ERROR:zygote_host_impl_linux.cc(89)] Running as root without --no-sandbox is not supported. See https://crbug.com/638180.
@@ -185,6 +184,10 @@ TROUBLESHOOTING:
 ```
 
 You should pass the argument `--no-sandbox` to the plugin as extra arguments.
+
+## Debugging puppeteer and Social Logins better
+
+Pass the configuration option `screenshotsPathWhenFailed` to `cy.task('GoogleSocialLogin')` with a path to a directory in which puppeteer will save a screenshot when there's a failure to complete the username or password login.
 
 # Author
 

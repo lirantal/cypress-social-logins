@@ -1,3 +1,5 @@
+const path = require('path')
+
 export const login = ({
   username = Cypress.env('googleSocialLoginUsername'),
   password = Cypress.env('googleSocialLoginPassword')
@@ -13,8 +15,9 @@ export const login = ({
         logs: false,
         loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
         postLoginSelector: '.account-panel',
-//         args: ['--no-sandbox', '--disable-setuid-sandbox']
-        args: ['--no-sandbox']
+        // args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox'],
+        screenshotsPathWhenFailed: './debug'
       }
 
       return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {

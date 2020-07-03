@@ -1,7 +1,11 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 /* eslint-disable no-undef */
 'use strict'
 
 const puppeteer = require('puppeteer')
+const os = require('os')
+const path = require('path')
+const fs = require('fs')
 
 /**
  *
@@ -19,10 +23,24 @@ const puppeteer = require('puppeteer')
  * @param {options.isPopup} boolean is your google auth displayed like a popup
  * @param {options.popupDelay} number delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely
  * @param {options.cookieDelay} number delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
+ * @param {options.screenshotsPathWhenFailed} string path to save screenshots for when issues arise with puppeteer's login process
  *
  */
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   validateOptions(options)
+
+  const screenshotsPath = options.screenshotsPathWhenFailed
+    ? options.screenshotsPathWhenFailed
+    : os.tmpdir()
+
+  try {
+    fs.statSync(screenshotsPath)
+  } catch (error) {
+    console.error(error)
+    console.error(`Unable to find screenshotsPath: ${screenshotsPath}`)
+    console.error('Trying to create it...')
+    fs.mkdirSync(screenshotsPath)
+  }
 
   const launchOptions = {headless: !!options.headless}
 
@@ -31,9 +49,13 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
   }
 
   const browser = await puppeteer.launch(launchOptions)
+
   let page = await browser.newPage()
   let originalPageIndex = 1
   await page.setViewport({width: 1280, height: 800})
+  await page.setUserAgent(
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'
+  )
 
   await page.goto(options.loginUrl)
   await login({page, options})
@@ -51,8 +73,19 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
     page = pages[pages.length - 1]
   }
 
-  await typeUsername({page, options})
-  await typePassword({page, options})
+  try {
+    await typeUsername({page, options})
+  } catch (error) {
+    await page.screenshot({path: path.join(screenshotsPath, 'screenshot-username.png')})
+    throw error
+  }
+
+  try {
+    await typePassword({page, options})
+  } catch (error) {
+    await page.screenshot({path: path.join(screenshotsPath, 'screenshot-password.png')})
+    throw error
+  }
 
   // Switch back to Original Window
   if (options.isPopup) {
@@ -107,10 +140,11 @@ async function login({page, options} = {}) {
 }
 
 async function typeUsername({page, options} = {}) {
-  let buttonSelector = options.headless ? '#next' : '#identifierNext'
+  let buttonSelectors = ['#next', '#identifierNext']
 
   await page.waitForSelector('input[type="email"]')
   await page.type('input[type="email"]', options.username)
+  const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
   await page.click(buttonSelector)
 }
 
