@@ -186,7 +186,7 @@ You should pass the argument `--no-sandbox` to the plugin as extra arguments.
 
 ## localStorage isn't persisting through all tests
 
-If you find that `lsd` is not persisting through tests (useful if you need a JWT from SSO in order to login before each test) using the default implementation above, then you can utilize the package `cypress-localstorage-commands` (https://www.npmjs.com/package/cypress-localstorage-commands):
+If you find that `lsd` is not persisting through tests (useful if you need a JWT from SSO in order to login before each test) using the default implementation above, then you can utilize the package `cypress-localstorage-commands` (https://www.npmjs.com/package/cypress-localstorage-commands).
 
 To use:
 
