@@ -37,7 +37,7 @@ Supported identity providers:
 
 1. Call the declared task with a set of options for the social login flow interaction
 2. Set the cookies for the test flow with the help of `Cypress.Cookies.defaults`
-3. Copy over all or some (or none) of the local & session storage objects from puppeteer to local instance
+3. Copy over all or some (or none) of the local & session storage objects from puppeteer to local instance. _Note:_ If you want to persist localStorage through all tests, see [Troubleshooting](##localStorage-isn't-persisting-through-all-tests) below.
 
 ```js
 cy.clearCookies()
