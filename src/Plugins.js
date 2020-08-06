@@ -34,6 +34,12 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
   let page = await browser.newPage()
   let originalPageIndex = 1
   await page.setViewport({width: 1280, height: 800})
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'en-US;q=0.9,en;q=0.8'
+  })
+  await page.setUserAgent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36'
+  )
 
   await page.goto(options.loginUrl)
   await login({page, options})
@@ -107,11 +113,9 @@ async function login({page, options} = {}) {
 }
 
 async function typeUsername({page, options} = {}) {
-  let buttonSelector = options.headless ? '#next' : '#identifierNext'
-
   await page.waitForSelector('input[type="email"]')
   await page.type('input[type="email"]', options.username)
-  await page.click(buttonSelector)
+  await page.click('#identifierNext')
 }
 
 async function typePassword({page, options} = {}) {
