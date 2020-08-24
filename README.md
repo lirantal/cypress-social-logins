@@ -54,7 +54,7 @@ return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies, lsd, ssd
     })
 
     Cypress.Cookies.defaults({
-      whitelist: cookieName
+      preserve: cookieName
     })
   }
 
@@ -156,7 +156,7 @@ describe('Login', () => {
         })
 
         Cypress.Cookies.defaults({
-          whitelist: cookieName
+          preserve: cookieName
         })
       }
     })
