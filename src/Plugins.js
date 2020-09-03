@@ -113,8 +113,8 @@ async function login({page, options} = {}) {
 }
 
 async function typeUsername({page, options} = {}) {
-  await page.waitForSelector('input[type="email"]')
-  await page.type('input[type="email"]', options.username)
+  await page.waitForSelector('input#identifierId[type="email"]')
+  await page.type('input#identifierId[type="email"]', options.username)
   await page.click('#identifierNext')
 }
 
