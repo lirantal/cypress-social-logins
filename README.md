@@ -25,13 +25,14 @@ It does so by delegating the login process to a `puppeteer` flow that performs t
 
 Supported identity providers:
 
-| Provider | Plugin name       |
-| -------- | ----------------- |
-| Google   | GoogleSocialLogin |
-| GitHub   | TBD               |
-| Facebook | TBD               |
-| Twitter  | TBD               |
-| LinkedIn | TBD               |
+| Provider  | Plugin name           |
+| --------- | --------------------- |
+| Google    | GoogleSocialLogin     |
+| GitHub    | GitHubSocialLogin     |
+| Microsoft | MicrosoftSocialLogin  | 
+| Facebook  | TBD                   |
+| Twitter   | TBD                   |
+| LinkedIn  | TBD                   |
 
 # Usage
 

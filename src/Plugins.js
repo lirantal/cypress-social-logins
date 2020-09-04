@@ -21,69 +21,6 @@ const puppeteer = require('puppeteer')
  * @param {options.cookieDelay} number delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
  *
  */
-module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
-  validateOptions(options)
-
-  const launchOptions = {headless: !!options.headless}
-
-  if (options.args && options.args.length) {
-    launchOptions.args = options.args
-  }
-
-  const browser = await puppeteer.launch(launchOptions)
-  let page = await browser.newPage()
-  let originalPageIndex = 1
-  await page.setViewport({width: 1280, height: 800})
-  await page.setExtraHTTPHeaders({
-    'Accept-Language': 'en-US;q=0.9,en;q=0.8'
-  })
-  await page.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36'
-  )
-
-  await page.goto(options.loginUrl)
-  await login({page, options})
-
-  // Switch to Popup Window
-  if (options.isPopup) {
-    if (options.popupDelay) {
-      await delay(options.popupDelay)
-    }
-    const pages = await browser.pages()
-    // remember original window index
-    originalPageIndex = pages.indexOf(
-      pages.find(p => page._target._targetId === p._target._targetId)
-    )
-    page = pages[pages.length - 1]
-  }
-
-  await typeUsername({page, options})
-  await typePassword({page, options})
-
-  // Switch back to Original Window
-  if (options.isPopup) {
-    if (options.popupDelay) {
-      await delay(options.popupDelay)
-    }
-    const pages = await browser.pages()
-    page = pages[originalPageIndex]
-  }
-
-  if (options.cookieDelay) {
-    await delay(options.cookieDelay)
-  }
-
-  const cookies = await getCookies({page, options})
-  const lsd = await getLocalStorageData({page, options})
-  const ssd = await getSessionStorageData({page, options})
-  await finalizeSession({page, browser, options})
-
-  return {
-    cookies,
-    lsd,
-    ssd
-  }
-}
 
 function delay(time) {
   return new Promise(function(resolve) {
@@ -110,22 +47,6 @@ async function login({page, options} = {}) {
   }
 
   await page.click(options.loginSelector)
-}
-
-async function typeUsername({page, options} = {}) {
-  await page.waitForSelector('input[type="email"]')
-  await page.type('input[type="email"]', options.username)
-  await page.click('#identifierNext')
-}
-
-async function typePassword({page, options} = {}) {
-  let buttonSelectors = ['#signIn', '#passwordNext', '#submit']
-
-  await page.waitForSelector('input[type="password"]', {visible: true})
-  await page.type('input[type="password"]', options.password)
-
-  const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
-  await page.click(buttonSelector)
 }
 
 async function getCookies({page, options} = {}) {
@@ -217,4 +138,135 @@ async function racePromises(promises) {
     resolved = true
     return index
   })
+}
+
+async function baseLoginConnect(typeUsername, typePassword, authorizeApp, options) {
+  validateOptions(options)
+
+  const launchOptions = {headless: !!options.headless}
+
+  if (options.args && options.args.length) {
+    launchOptions.args = options.args
+  }
+
+  const browser = await puppeteer.launch(launchOptions)
+  let page = await browser.newPage()
+  let originalPageIndex = 1
+  await page.setViewport({width: 1280, height: 800})
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'en-USq=0.9,enq=0.8'
+  })
+  await page.setUserAgent(
+    'Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36'
+  )
+
+  await page.goto(options.loginUrl)
+  await login({page, options})
+
+  // Switch to Popup Window
+  if (options.isPopup) {
+    if (options.popupDelay) {
+      await delay(options.popupDelay)
+    }
+    const pages = await browser.pages()
+    // remember original window index
+    originalPageIndex = pages.indexOf(
+      pages.find(p => page._target._targetId === p._target._targetId)
+    )
+    page = pages[pages.length - 1]
+  }
+
+  await typeUsername({page, options})
+  await typePassword({page, options})
+
+  if (options.authorize) {
+    authorizeApp({page, options})
+  }
+
+  // Switch back to Original Window
+  if (options.isPopup) {
+    if (options.popupDelay) {
+      await delay(options.popupDelay)
+    }
+    const pages = await browser.pages()
+    page = pages[originalPageIndex]
+  }
+
+  if (options.cookieDelay) {
+    await delay(options.cookieDelay)
+  }
+
+  const cookies = await getCookies({page, options})
+  const lsd = await getLocalStorageData({page, options})
+  const ssd = await getSessionStorageData({page, options})
+  await finalizeSession({page, browser, options})
+
+  return {
+    cookies,
+    lsd,
+    ssd
+  }
+}
+
+module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
+  const typeUsername = async function({page, options} = {}) {
+    await page.waitForSelector('input[type="email"]')
+    await page.type('input[type="email"]', options.username)
+    await page.click('#identifierNext')
+  }
+
+  const typePassword = async function({page, options} = {}) {
+    let buttonSelectors = ['#signIn', '#passwordNext', '#submit']
+
+    await page.waitForSelector('input[type="password"]', {visible: true})
+    await page.type('input[type="password"]', options.password)
+
+    const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
+    await page.click(buttonSelector)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, null, options)
+}
+
+module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}) {
+  const typeUsername = async function({page, options} = {}) {
+    await page.waitForSelector('input#login_field')
+    await page.type('input#login_field', options.username)
+  }
+
+  const typePassword = async function({page, options} = {}) {
+    await page.waitForSelector('input#password', {visible: true})
+    await page.type('input#password', options.password)
+    await page.click('input[type="submit"]')
+  }
+
+  const authorizeApp = async function({page, options} = {}) {
+    await page.waitForSelector('button#js-oauth-authorize-btn', {visible: true})
+    await page.click('button#js-oauth-authorize-btn', options.password)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, authorizeApp, options)
+}
+
+module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(options = {}) {
+  const typeUsername = async function({page, options} = {}) {
+    await page.waitForSelector('input[type="email"]')
+    await page.type('input[type="email"]', options.username)
+    await page.click('input[type="submit"]')
+  }
+
+  const typePassword = async function({page, options} = {}) {
+    await delay(5000)
+
+    await page.waitForSelector('input[type="password"]', {visible: true})
+    await page.type('input[type="password"]', options.password)
+    await page.click('input[type="submit"]')
+  }
+
+  const authorizeApp = async function({page, options} = {}) {
+    await page.waitForSelector('button#js-oauth-authorize-btn', {visible: true})
+    await page.click('button#js-oauth-authorize-btn', options.password)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, authorizeApp, options)
 }
