@@ -210,8 +210,8 @@ async function baseLoginConnect(typeUsername, typePassword, authorizeApp, option
 
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   const typeUsername = async function({page, options} = {}) {
-    await page.waitForSelector('input[type="email"]')
-    await page.type('input[type="email"]', options.username)
+    await page.waitForSelector('input#identifierId[type="email"]')
+    await page.type('input#identifierId[type="email"]', options.username)
     await page.click('#identifierNext')
   }
 
