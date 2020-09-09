@@ -60,7 +60,7 @@ async function getCookies({page, options} = {}) {
     await page.waitForSelector(options.postLoginSelector)
   } catch (error) {
     await page.screenshot({
-      path: path.join(options.screenshotsPath, 'screenshot-postLoginSelector.png')
+      path: path.join(screenshotsPath, 'screenshot-postLoginSelector.png')
     })
     throw error
   }
@@ -265,6 +265,9 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
     await page.type('input#password', options.password)
     await page.screenshot({path: path.join(screenshotsPath, 'screenshot-password.png')})
     await page.click('input[type="submit"]')
+    await page.screenshot({
+      path: path.join(screenshotsPath, 'screenshot-password-post-click.png')
+    })
   }
 
   const authorizeApp = async function({page, options} = {}) {
