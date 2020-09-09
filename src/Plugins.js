@@ -263,6 +263,7 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
   const typePassword = async function({page, options} = {}) {
     await page.waitForSelector('input#password', {visible: true})
     await page.type('input#password', options.password)
+    await delay(2000)
     await page.screenshot({path: path.join(screenshotsPath, 'screenshot-password.png')})
     await page.click('input[type="submit"]')
     await page.screenshot({
