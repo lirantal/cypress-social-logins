@@ -1,7 +1,13 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 /* eslint-disable no-undef */
 'use strict'
 
+// const os = require('os')
+const path = require('path')
+const fs = require('fs')
 const puppeteer = require('puppeteer')
+
+const screenshotsPath = './debug'
 
 /**
  *
@@ -50,7 +56,14 @@ async function login({page, options} = {}) {
 }
 
 async function getCookies({page, options} = {}) {
-  await page.waitForSelector(options.postLoginSelector)
+  try {
+    await page.waitForSelector(options.postLoginSelector)
+  } catch (error) {
+    await page.screenshot({
+      path: path.join(options.screenshotsPath, 'screenshot-postLoginSelector.png')
+    })
+    throw error
+  }
 
   const cookies = options.getAllBrowserCookies
     ? await getCookiesForAllDomains(page)
@@ -143,6 +156,18 @@ async function racePromises(promises) {
 async function baseLoginConnect(typeUsername, typePassword, authorizeApp, options) {
   validateOptions(options)
 
+  try {
+    fs.statSync(screenshotsPath)
+  } catch (error) {
+    console.error(error)
+    console.error(`Unable to find screenshotsPath: ${screenshotsPath}`)
+    console.error('Trying to create it...')
+    fs.mkdirSync(screenshotsPath)
+  }
+
+  options.screenshotsPath = screenshotsPath
+  console.log(`screenshotsPath set to: ${screenshotsPath}`)
+
   const launchOptions = {headless: !!options.headless}
 
   if (options.args && options.args.length) {
@@ -232,11 +257,13 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
   const typeUsername = async function({page, options} = {}) {
     await page.waitForSelector('input#login_field')
     await page.type('input#login_field', options.username)
+    await page.screenshot({path: path.join(screenshotsPath, 'screenshot-username.png')})
   }
 
   const typePassword = async function({page, options} = {}) {
     await page.waitForSelector('input#password', {visible: true})
     await page.type('input#password', options.password)
+    await page.screenshot({path: path.join(screenshotsPath, 'screenshot-password.png')})
     await page.click('input[type="submit"]')
   }
 
