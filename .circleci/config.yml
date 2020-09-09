@@ -1,4 +1,5 @@
 version: 2.1
+
 jobs:
   build:
     working_directory: ~/project
@@ -10,15 +11,18 @@ jobs:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: install
-          command: npm install --ignore-engines
+          command: npm ci --ignore-engines
       - save_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
+            - ~/.cache/Cypress
       - persist_to_workspace:
-          root: ~/project
+          root: ~/
           paths:
-            - ./node_modules
+            - project/node_modules
+            - .cache
+            - cypress/*
 
   lint:
     working_directory: ~/project
@@ -27,26 +31,31 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./
+          at: ~/
       - run:
           name: lint
           command: npm run lint
 
-  # no tests :(((
-  # test:
-  #   working_directory: ~/project
-  #   docker:
-  #     - image: circleci/node:12
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ./
-  #     - run:
-  #         name: test
-  #         command: npm run test
-  #     - run:
-  #         name: coverage
-  #         command: npx codecov
+  test:
+    working_directory: ~/project
+    docker:
+      - image: circleci/node:8.12.0-browsers
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: test
+          command: npm run test
+      - run:
+          name: coverage
+          command: npx codecov
+      - store_artifacts:
+          path: cypress/videos
+      - store_artifacts:
+          path: cypress/screenshots
+      - store_artifacts:
+          path: debug/
 
   release:
     working_directory: ~/project
@@ -55,7 +64,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./
+          at: ~/
       - run:
           name: release
           command: npm run semantic-release
@@ -68,6 +77,9 @@ workflows:
       - lint:
           requires:
             - build
+      - test:
+          requires:
+            - lint
       - release:
           filters:
             branches:

@@ -17,6 +17,10 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 
+# Ignore cypress files
+cypress/screenshots
+cypress/videos
+
 # nyc test coverage
 .nyc_output
 
@@ -78,6 +82,3 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
-
-# IntelliJ IDEA files
-.idea

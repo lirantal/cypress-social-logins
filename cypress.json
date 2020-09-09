@@ -1,0 +1,18 @@
+{
+  "baseUrl": "https://app.snyk.io",
+  "env": {
+    "cookieName": "snyk.id",
+    "//googleSocialLoginUsername": "__SET_IN_CI_ENVIRONMENT__",
+    "//googleSocialLoginPassword": "__SET_IN_CI_ENVIRONMENT__",
+    "//githubSocialLoginUsername": "__SET_IN_CI_ENVIRONMENT__",
+    "//githubSocialLoginPassword": "__SET_IN_CI_ENVIRONMENT__",
+    "loginUrl": "https://app.snyk.io/login",
+    "homepage": "https://www.snyk.io"
+  },
+  "blacklistHosts": [
+    "www.google-analytics.com"
+  ],
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0",
+  "chromeWebSecurity": false,
+  "projectId": "99u316"
+}

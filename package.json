@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier-standard '**/*.js'",
-    "test": "exit 0",
+    "test": "cypress run --record --key $CYPRESS_RECORD_KEY",
     "test:watch": "jest --watch",
     "coverage:view": "opn coverage/lcov-report/index.html",
     "commit": "git-cz",
@@ -49,6 +49,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
     "commitizen": "^2.9.5",
+    "cypress": "^4.0.2",
     "cz-conventional-changelog": "^1.2.0",
     "eslint": "^5.10.0",
     "eslint-config-standard": "^12.0.0",
@@ -95,7 +96,7 @@
       "commit-msg": "commitlint --env HUSKY_GIT_PARAMS",
       "pre-commit": "lint-staged",
       "post-merge": "npm install",
-      "pre-push": "npm run lint && npm run test"
+      "pre-push": "npm run lint"
     }
   },
   "lint-staged": {
@@ -127,7 +128,8 @@
   },
   "eslintIgnore": [
     "coverage/**",
-    "template/**"
+    "template/**",
+    "cypress/**"
   ],
   "eslintConfig": {
     "env": {
