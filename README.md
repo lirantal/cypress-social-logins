@@ -246,6 +246,18 @@ afterEach(() => {
 })
 ```
 
+## Error: module not found: "ws" from file
+
+If you're getting an error message such as:
+
+```
+Error: module not found: "ws" from file ..... node_modules/puppeteer/lib/WebSocketTransport.js #17
+```
+
+It may be due to the fact that you're requiring one of the exported plugin functions, such as `GoogleSocialLogin` in your spec file in addition to requiring it in `cypress/plugins/index.js`. Remove it from your spec file.
+
+See discussion about [in this issue](https://github.com/lirantal/cypress-social-logins/issues/17).
+
 # Author
 
 Liran Tal <liran.tal@gmail.com>
