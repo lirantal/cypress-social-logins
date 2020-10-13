@@ -165,6 +165,33 @@ describe('Login', () => {
 })
 ```
 
+## Defining custom login
+
+```js
+const { baseLoginConnect } = require('cypress-social-logins').plugins
+
+module.exports = (on, config) => {
+    on('task', {
+        customLogin(options) {
+            async function typeUsername({ page, options } = {
+            }) {
+                await page.waitForSelector('input[id="username"')
+                await page.type('input[id="username"', options.username)
+            }
+
+            async function typePassword({ page, options } = {
+            }) {
+                await page.waitForSelector('input[id="password"]')
+                await page.type('input[id="password"]', options.password)
+                await page.click('button[id="_submit"]')
+            }
+
+            return baseLoginConnect(typeUsername, typePassword, null, options);
+        }
+    })
+}
+```
+
 # Troubleshooting
 
 ## Timeout while trying to enter username
