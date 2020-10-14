@@ -167,7 +167,7 @@ describe('Login', () => {
 
 ## Defining custom login
 
-By providing custom `typeUsername` and `typePassword` functions you can use not supported logins.
+When you need to use social logins which aren't supported by this plugin you can make use of the `baseLoginConnect()` function that is exported as part of the plugin like so:
 
 ```js
 const { baseLoginConnect } = require('cypress-social-logins').plugins
