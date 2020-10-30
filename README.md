@@ -283,7 +283,7 @@ If you're getting an error message such as:
 Error: module not found: "ws" from file ..... node_modules/puppeteer/lib/WebSocketTransport.js #17
 ```
 
-It may be due to the fact that you're requiring one of the exported plugin functions, such as `GoogleSocialLogin` in your spec file in addition to requiring it in `cypress/plugins/index.js`. Remove it from your spec file.
+It may be due to the fact that you're requiring one of the exported plugin functions, such as `GoogleSocialLogin` in your spec file in addition to requiring it in `cypress/plugins/index.js`. Remove it from your spec file, or from a `support/index.js` and make sure you export the `GoogleSocialLogin` function as a task only from the `/plugins/index.js` file.
 
 See discussion about [in this issue](https://github.com/lirantal/cypress-social-logins/issues/17).
 
