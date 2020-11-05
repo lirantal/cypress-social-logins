@@ -141,7 +141,7 @@ async function racePromises(promises) {
   })
 }
 
-async function baseLoginConnect(typeUsername, typePassword, authorizeApp, options) {
+async function baseLoginConnect(typeUsername, typePassword, authorizeApp, postLogin, options) {
   validateOptions(options)
 
   const launchOptions = {headless: !!options.headless}
