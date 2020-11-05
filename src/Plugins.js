@@ -19,6 +19,7 @@ const puppeteer = require('puppeteer')
  * @param {options.isPopup} boolean is your google auth displayed like a popup
  * @param {options.popupDelay} number delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely
  * @param {options.cookieDelay} number delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
+ * @param {options.postLoginClick} string a selector to find and click on after clicking on the login button
  *
  */
 
@@ -180,7 +181,7 @@ async function baseLoginConnect(typeUsername, typePassword, authorizeApp, option
   await typePassword({page, options})
 
   if (options.authorize) {
-    authorizeApp({page, options})
+    await authorizeApp({page, options})
   }
 
   // Switch back to Original Window
@@ -190,6 +191,10 @@ async function baseLoginConnect(typeUsername, typePassword, authorizeApp, option
     }
     const pages = await browser.pages()
     page = pages[originalPageIndex]
+  }
+
+  if (options.postLoginClick) {
+    await postLogin({page, options})
   }
 
   if (options.cookieDelay) {
@@ -227,7 +232,12 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
     await page.click(buttonSelector)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, null, options)
+  const postLogin = async function ({page, options} = {}) {
+    await page.waitForSelector(options.postLoginClick)
+    await page.click(options.postLoginClick)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, null, postLogin, options)
 }
 
 module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}) {
@@ -247,7 +257,12 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
     await page.click('button#js-oauth-authorize-btn', options.password)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, authorizeApp, options)
+  const postLogin = async function ({page, options} = {}) {
+    await page.waitForSelector(options.postLoginClick)
+    await page.click(options.postLoginClick)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, authorizeApp, postLogin, options)
 }
 
 module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(options = {}) {
@@ -270,5 +285,10 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
     await page.click('button#js-oauth-authorize-btn', options.password)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, authorizeApp, options)
+  const postLogin = async function ({page, options} = {}) {
+    await page.waitForSelector(options.postLoginClick)
+    await page.click(options.postLoginClick)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, authorizeApp, postLogin, options)
 }
