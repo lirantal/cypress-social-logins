@@ -30,6 +30,7 @@ Supported identity providers:
 | Google    | GoogleSocialLogin     |
 | GitHub    | GitHubSocialLogin     |
 | Microsoft | MicrosoftSocialLogin  | 
+| Amazon    | AmazonSocialLogin     |
 | Facebook  | TBD                   |
 | Twitter   | TBD                   |
 | LinkedIn  | TBD                   |
@@ -82,6 +83,7 @@ Options passed to the task include:
 | loginSelector        | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link             | `'a[href="/auth/auth0/google-oauth2"]'`        |
 | postLoginSelector    | A selector on the post-login page that can be asserted upon to confirm a successful login                                         | `'.account-panel'`                             |
 | preLoginSelector     | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`                     |
+| otpSecret            | Secret for generating a otp based on OTPLIB                                                                                       | `'SECRET'`                                     |
 | loginSelectorDelay   | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                          |
 | getAllBrowserCookies | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                           |
 | isPopup              | boolean, is your google auth displayed like a popup                                                                               | true                                           |
@@ -195,6 +197,17 @@ module.exports = (on, config) => {
 }
 ```
 
+## Using AmazonSocialLogin with OneTimePassword
+
+You need a amazon account with activated 2fa. The QR-Code is provided by amazon and contains a SECRET to
+calculate a OTP. This is mandatory due the enforcement of 2fa of new amazon-accounts. SMS or E-Mail is not supported.
+You can extract the Secret from the QR-Code:
+```
+otpauth://totp/Amazon%3ASomeUser%40Example?secret=IBU3VLM........&issuer=Amazon
+```
+You need to setup the account in amazon with GoogleAuthenticator or any password-manager which supports OTP. Further
+information here https://www.amazon.com/gp/help/customer/display.html?nodeId=GE6SLZ5J9GCNRW44
+
 # Troubleshooting
 
 ## Timeout while trying to enter username
@@ -287,6 +300,10 @@ Error: module not found: "ws" from file ..... node_modules/puppeteer/lib/WebSock
 It may be due to the fact that you're requiring one of the exported plugin functions, such as `GoogleSocialLogin` in your spec file in addition to requiring it in `cypress/plugins/index.js`. Remove it from your spec file, or from a `support/index.js` and make sure you export the `GoogleSocialLogin` function as a task only from the `/plugins/index.js` file.
 
 See discussion about [in this issue](https://github.com/lirantal/cypress-social-logins/issues/17).
+
+## Amazon OTP not accepted
+
+Please be aware of proper time on your machine. Make sure you are using ntp to be in sync.
 
 # Author
 
