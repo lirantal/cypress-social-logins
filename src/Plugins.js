@@ -2,6 +2,7 @@
 'use strict'
 
 const puppeteer = require('puppeteer')
+const authenticator = require('otplib').authenticator
 
 /**
  *
@@ -13,6 +14,7 @@ const puppeteer = require('puppeteer')
  * @param {options.loginSelectorDelay} number delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely.
  * @param {options.postLoginSelector} string a selector on the app's post-login return page to assert that login is successful
  * @param {options.preLoginSelector} string a selector to find and click on before clicking on the login button (useful for accepting cookies)
+ * @param {options.otpSecret} string Secret for generating a otp based on OTPLIB
  * @param {options.headless} boolean launch puppeteer in headless more or not
  * @param {options.logs} boolean whether to log cookies and other metadata to console
  * @param {options.getAllBrowserCookies} boolean whether to get all browser cookies instead of just for the loginUrl
@@ -141,7 +143,14 @@ async function racePromises(promises) {
   })
 }
 
-async function baseLoginConnect(typeUsername, typePassword, authorizeApp, postLogin, options) {
+async function baseLoginConnect(
+  typeUsername,
+  typePassword,
+  otpApp,
+  authorizeApp,
+  postLogin,
+  options
+) {
   validateOptions(options)
 
   const launchOptions = {headless: !!options.headless}
@@ -179,6 +188,10 @@ async function baseLoginConnect(typeUsername, typePassword, authorizeApp, postLo
 
   await typeUsername({page, options})
   await typePassword({page, options})
+
+  if (options.otpSecret && otpApp) {
+    await otpApp({page, options})
+  }
 
   if (options.authorize) {
     await authorizeApp({page, options})
@@ -232,12 +245,12 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
     await page.click(buttonSelector)
   }
 
-  const postLogin = async function ({page, options} = {}) {
+  const postLogin = async function({page, options} = {}) {
     await page.waitForSelector(options.postLoginClick)
     await page.click(options.postLoginClick)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, null, postLogin, options)
+  return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
 }
 
 module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}) {
@@ -257,12 +270,12 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
     await page.click('button#js-oauth-authorize-btn', options.password)
   }
 
-  const postLogin = async function ({page, options} = {}) {
+  const postLogin = async function({page, options} = {}) {
     await page.waitForSelector(options.postLoginClick)
     await page.click(options.postLoginClick)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, authorizeApp, postLogin, options)
+  return baseLoginConnect(typeUsername, typePassword, null, authorizeApp, postLogin, options)
 }
 
 module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(options = {}) {
@@ -285,10 +298,39 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
     await page.click('button#js-oauth-authorize-btn', options.password)
   }
 
-  const postLogin = async function ({page, options} = {}) {
+  const postLogin = async function({page, options} = {}) {
     await page.waitForSelector(options.postLoginClick)
     await page.click(options.postLoginClick)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, authorizeApp, postLogin, options)
+  return baseLoginConnect(typeUsername, typePassword, null, authorizeApp, postLogin, options)
+}
+
+module.exports.AmazonSocialLogin = async function AmazonSocialLogin(options = {}) {
+  const typeUsername = async function({page, options} = {}) {
+    await page.waitForSelector('#ap_email', {visible: true})
+    await page.type('#ap_email', options.username)
+  }
+
+  const typePassword = async function({page, options} = {}) {
+    let buttonSelectors = ['#signInSubmit']
+
+    await page.waitForSelector('input[type="password"]', {visible: true})
+    await page.type('input[type="password"]', options.password)
+
+    const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
+    await page.click(buttonSelector)
+  }
+
+  const otpApp = async function({page, options} = {}) {
+    let buttonSelectors = ['#auth-signin-button']
+
+    await page.waitForSelector('#auth-mfa-otpcode', {visible: true})
+    await page.type('#auth-mfa-otpcode', authenticator.generate(options.otpSecret))
+
+    const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
+    await page.click(buttonSelector)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, otpApp, null, null, options)
 }
