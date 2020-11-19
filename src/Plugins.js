@@ -14,6 +14,8 @@ const authenticator = require('otplib').authenticator
  * @param {options.loginSelectorDelay} number delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely.
  * @param {options.postLoginSelector} string a selector on the app's post-login return page to assert that login is successful
  * @param {options.preLoginSelector} string a selector to find and click on before clicking on the login button (useful for accepting cookies)
+ * @param {options.preLoginSelectorIframe} string a selector to find a iframe for the preLoginSelector
+ * @param {options.preLoginSelectorIframeDelay} number delay a specific milliseconds after click on the preLoginSelector. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
  * @param {options.otpSecret} string Secret for generating a otp based on OTPLIB
  * @param {options.headless} boolean launch puppeteer in headless more or not
  * @param {options.logs} boolean whether to log cookies and other metadata to console
@@ -38,9 +40,18 @@ function validateOptions(options) {
 }
 
 async function login({page, options} = {}) {
-  if (options.preLoginSelector) {
+  if (options.preLoginSelector && !options.preLoginSelectorIframe) {
     await page.waitForSelector(options.preLoginSelector)
     await page.click(options.preLoginSelector)
+  } else if (options.preLoginSelector && options.preLoginSelectorIframe) {
+    await page.waitForSelector(options.preLoginSelectorIframe)
+    const elementHandle = await page.$(options.preLoginSelectorIframe)
+    const frame = await elementHandle.contentFrame()
+    await frame.waitForSelector(options.preLoginSelector)
+    await frame.click(options.preLoginSelector)
+    if (options.preLoginSelectorIframeDelay !== false) {
+      await delay(options.preLoginSelectorIframeDelay)
+    }
   }
 
   await page.waitForSelector(options.loginSelector)

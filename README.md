@@ -72,24 +72,26 @@ return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies, lsd, ssd
 
 Options passed to the task include:
 
-| Option name          | Description                                                                                                                       | Example                                        |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| username             |                                                                                                                                   |
-| password             |                                                                                                                                   |
-| loginUrl             | The URL for the login page that includes the social network buttons                                                               | https://www.example.com/login                  |
-| args                 | string array which allows providing further arguments to puppeteer                                                                | `['--no-sandbox', '--disable-setuid-sandbox']` |
-| headless             | Whether to run puppeteer in headless mode or not                                                                                  | true                                           |
-| logs                 | Whether to log interaction with the loginUrl website & cookie data                                                                | false                                          |
-| loginSelector        | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link             | `'a[href="/auth/auth0/google-oauth2"]'`        |
-| postLoginSelector    | A selector on the post-login page that can be asserted upon to confirm a successful login                                         | `'.account-panel'`                             |
-| preLoginSelector     | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`                     |
-| otpSecret            | Secret for generating a otp based on OTPLIB                                                                                       | `'SECRET'`                                     |
-| loginSelectorDelay   | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                          |
-| getAllBrowserCookies | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                           |
-| isPopup              | boolean, is your google auth displayed like a popup                                                                               | true                                           |
-| popupDelay           | number, delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely     | 2000                                           |
-| cookieDelay          | number, delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null,undefined,'') to avoid completely        | 100                                            |
-| postLoginClick       | a selector to find and click on after clicking on the login button                                                                | `#idSIButton9`                                 |
+| Option name                 | Description                                                                                                                       | Example                                        |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| username                    |                                                                                                                                   |
+| password                    |                                                                                                                                   |
+| loginUrl                    | The URL for the login page that includes the social network buttons                                                               | https://www.example.com/login                  |
+| args                        | string array which allows providing further arguments to puppeteer                                                                | `['--no-sandbox', '--disable-setuid-sandbox']` |
+| headless                    | Whether to run puppeteer in headless mode or not                                                                                  | true                                           |
+| logs                        | Whether to log interaction with the loginUrl website & cookie data                                                                | false                                          |
+| loginSelector               | A selector on the page that defines the specific social network to use and can be clicked, such as a button or a link             | `'a[href="/auth/auth0/google-oauth2"]'`        |
+| postLoginSelector           | A selector on the post-login page that can be asserted upon to confirm a successful login                                         | `'.account-panel'`                             |
+| preLoginSelector            | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`                     |
+| preLoginSelectorIframe      | string a selector to find a iframe for the preLoginSelector                                                                       | `'div#consent iframe'`                         |
+| preLoginSelectorIframeDelay | number delay a specific ms after click on the preLoginSelector. Pass a falsy (false, 0, null, undefined, '') to avoid completely. | 2000                                           |
+| otpSecret                   | Secret for generating a otp based on OTPLIB                                                                                       | `'SECRET'`                                     |
+| loginSelectorDelay          | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                          |
+| getAllBrowserCookies        | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                           |
+| isPopup                     | boolean, is your google auth displayed like a popup                                                                               | true                                           |
+| popupDelay                  | number, delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely     | 2000                                           |
+| cookieDelay                 | number, delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null,undefined,'') to avoid completely        | 100                                            |
+| postLoginClick              | a selector to find and click on after clicking on the login button                                                                | `#idSIButton9`                                 |
 
 ## Install
 
