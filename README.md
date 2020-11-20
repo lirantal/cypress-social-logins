@@ -91,7 +91,7 @@ Options passed to the task include:
 | isPopup                     | boolean, is your google auth displayed like a popup                                                                               | true                                           |
 | popupDelay                  | number, delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely     | 2000                                           |
 | cookieDelay                 | number, delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null,undefined,'') to avoid completely        | 100                                            |
-| postLoginClick              | a selector to find and click on after clicking on the login button                                                                | `#idSIButton9`                                 |
+| postLoginClick              | Optional: a selector to find and click on after clicking on the login button                                                                | `#idSIButton9`                                 |
 
 ## Install
 
