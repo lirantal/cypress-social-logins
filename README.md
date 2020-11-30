@@ -139,9 +139,9 @@ describe('Login', () => {
     const loginUrl = Cypress.env('loginUrl')
     const cookieName = Cypress.env('cookieName')
     const socialLoginOptions = {
-      username,
-      password,
-      loginUrl,
+      username: username,
+      password: password,
+      loginUrl: loginUrl,
       headless: true,
       logs: false,
       loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
@@ -249,9 +249,9 @@ before(() => {
     const loginUrl = Cypress.env('loginUrl')
     const localStorageItem = Cypress.env('lsdItemName')
     const socialLoginOptions = {
-      username,
-      password,
-      loginUrl,
+      username: username,
+      password: password,
+      loginUrl: loginUrl,
       headless: true,
       logs: false,
       loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
