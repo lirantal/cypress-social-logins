@@ -31,7 +31,7 @@ Supported identity providers:
 | GitHub    | GitHubSocialLogin     |
 | Microsoft | MicrosoftSocialLogin  | 
 | Amazon    | AmazonSocialLogin     |
-| Facebook  | TBD                   |
+| Facebook  | FacebookSocialLogin   |
 | Twitter   | TBD                   |
 | LinkedIn  | TBD                   |
 
