@@ -345,3 +345,31 @@ module.exports.AmazonSocialLogin = async function AmazonSocialLogin(options = {}
 
   return baseLoginConnect(typeUsername, typePassword, otpApp, null, null, options)
 }
+
+module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options = {}) {
+  const typeUsername = async function({page, options} = {}) {
+    const emailSelector = '#email'
+    await page.waitForSelector(emailSelector)
+    await page.type(emailSelector, options.username)
+  }
+
+  const typePassword = async function({page, options} = {}) {
+    await page.waitForSelector('input[type="password"]', {visible: true})
+    await page.type('input[type="password"]', options.password)
+
+    // Submit first form
+    await page.click('#loginbutton input')
+
+    // Submit next form
+    const confirmBtnSelector = 'button[name="__CONFIRM__"]'
+    await page.waitForSelector(confirmBtnSelector)
+    await page.click(confirmBtnSelector)
+  }
+
+  const postLogin = async function({page, options} = {}) {
+    await page.waitForSelector(options.postLoginClick)
+    await page.click(options.postLoginClick)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
+}

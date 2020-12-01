@@ -19,7 +19,7 @@
 
 This Cypress library makes it possible to perform third-party logins (think oauth) for services such as GitHub, Google or Facebook.
 
-It does so by delegating the login process to a `puppeteer` flow that performs the login and returns the cookies for the application under test so they can be set by the calling Cypress flow for the duration of the test.
+It does so by delegating the login process to a `puppeteer` flow that performs the login and returns the cookies for the application under test, so they can be set by the calling Cypress flow for the duration of the test.
 
 ## Support
 
@@ -31,7 +31,7 @@ Supported identity providers:
 | GitHub    | GitHubSocialLogin     |
 | Microsoft | MicrosoftSocialLogin  | 
 | Amazon    | AmazonSocialLogin     |
-| Facebook  | TBD                   |
+| Facebook  | FacebookSocialLogin   |
 | Twitter   | TBD                   |
 | LinkedIn  | TBD                   |
 
@@ -85,7 +85,7 @@ Options passed to the task include:
 | preLoginSelector            | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`                     |
 | preLoginSelectorIframe      | string a selector to find a iframe for the preLoginSelector                                                                       | `'div#consent iframe'`                         |
 | preLoginSelectorIframeDelay | number delay a specific ms after click on the preLoginSelector. Pass a falsy (false, 0, null, undefined, '') to avoid completely. | 2000                                           |
-| otpSecret                   | Secret for generating a otp based on OTPLIB                                                                                       | `'SECRET'`                                     |
+| otpSecret                   | Secret for generating a one-time password based on OTPLIB                                                                         | `'SECRET'`                                     |
 | loginSelectorDelay          | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                          |
 | getAllBrowserCookies        | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                           |
 | isPopup                     | boolean, is your google auth displayed like a popup                                                                               | true                                           |
@@ -127,7 +127,7 @@ other configurations that need to be specified so that the task can navigate
 through the page properly.
 
 Once the task has completed it will return the list of cookies from the new
-page. Most likely that these cookies need to be set for the rest of the
+page. Most likely these cookies need to be set for the rest of the
 sessions in the test flow, hence the example code showing the case for
 `Cypress.Cookies.defaults`.
 
@@ -139,9 +139,9 @@ describe('Login', () => {
     const loginUrl = Cypress.env('loginUrl')
     const cookieName = Cypress.env('cookieName')
     const socialLoginOptions = {
-      username,
-      password,
-      loginUrl,
+      username: username,
+      password: password,
+      loginUrl: loginUrl,
       headless: true,
       logs: false,
       loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
@@ -201,14 +201,15 @@ module.exports = (on, config) => {
 
 ## Using AmazonSocialLogin with OneTimePassword
 
-You need a amazon account with activated 2fa. The QR-Code is provided by amazon and contains a SECRET to
-calculate a OTP. This is mandatory due the enforcement of 2fa of new amazon-accounts. SMS or E-Mail is not supported.
+You need an Amazon account with activated 2fa. The QR-Code is provided by Amazon and contains a SECRET to
+calculate an OTP. This is mandatory due the enforcement of 2fa of new amazon-accounts. SMS or E-Mail is not supported.
 You can extract the Secret from the QR-Code:
 ```
 otpauth://totp/Amazon%3ASomeUser%40Example?secret=IBU3VLM........&issuer=Amazon
 ```
-You need to setup the account in amazon with GoogleAuthenticator or any password-manager which supports OTP. Further
-information here https://www.amazon.com/gp/help/customer/display.html?nodeId=GE6SLZ5J9GCNRW44
+You need to set up the account in Amazon with GoogleAuthenticator or any password-manager which supports OTP. Further
+information here:
+https://www.amazon.com/gp/help/customer/display.html?nodeId=GE6SLZ5J9GCNRW44
 
 # Troubleshooting
 
@@ -248,9 +249,9 @@ before(() => {
     const loginUrl = Cypress.env('loginUrl')
     const localStorageItem = Cypress.env('lsdItemName')
     const socialLoginOptions = {
-      username,
-      password,
-      loginUrl,
+      username: username,
+      password: password,
+      loginUrl: loginUrl,
       headless: true,
       logs: false,
       loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
