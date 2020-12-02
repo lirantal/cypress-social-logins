@@ -2,6 +2,7 @@
 'use strict'
 
 const puppeteer = require('puppeteer')
+const authenticator = require('otplib').authenticator
 
 /**
  *
@@ -13,13 +14,21 @@ const puppeteer = require('puppeteer')
  * @param {options.loginSelectorDelay} number delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely.
  * @param {options.postLoginSelector} string a selector on the app's post-login return page to assert that login is successful
  * @param {options.preLoginSelector} string a selector to find and click on before clicking on the login button (useful for accepting cookies)
+ * @param {options.preLoginSelectorIframe} string a selector to find a iframe for the preLoginSelector
+ * @param {options.preLoginSelectorIframeDelay} number delay a specific milliseconds after click on the preLoginSelector. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
+ * @param {options.otpSecret} string Secret for generating a otp based on OTPLIB
  * @param {options.headless} boolean launch puppeteer in headless more or not
  * @param {options.logs} boolean whether to log cookies and other metadata to console
  * @param {options.getAllBrowserCookies} boolean whether to get all browser cookies instead of just for the loginUrl
  * @param {options.isPopup} boolean is your google auth displayed like a popup
  * @param {options.popupDelay} number delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely
  * @param {options.cookieDelay} number delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
- *
+ * @param {options.postLoginClick} string a selector to find and click on after clicking on the login button
+ * @param {options.usernameField} string selector for the username field
+ * @param {options.usernameSubmitBtn} string selector for the username button
+ * @param {options.passwordField} string selector for the password field
+ * @param {options.passwordSubmitBtn} string selector password submit button
+ * @param {options.additionalSteps} function any additional func which may be required for signin step after username and password
  */
 
 function delay(time) {
@@ -35,9 +44,18 @@ function validateOptions(options) {
 }
 
 async function login({page, options} = {}) {
-  if (options.preLoginSelector) {
+  if (options.preLoginSelector && !options.preLoginSelectorIframe) {
     await page.waitForSelector(options.preLoginSelector)
     await page.click(options.preLoginSelector)
+  } else if (options.preLoginSelector && options.preLoginSelectorIframe) {
+    await page.waitForSelector(options.preLoginSelectorIframe)
+    const elementHandle = await page.$(options.preLoginSelectorIframe)
+    const frame = await elementHandle.contentFrame()
+    await frame.waitForSelector(options.preLoginSelector)
+    await frame.click(options.preLoginSelector)
+    if (options.preLoginSelectorIframeDelay !== false) {
+      await delay(options.preLoginSelectorIframeDelay)
+    }
   }
 
   await page.waitForSelector(options.loginSelector)
@@ -140,10 +158,12 @@ async function racePromises(promises) {
   })
 }
 
-module.exports.baseLoginConnect = async function baseLoginConnect(
+async function baseLoginConnect(
   typeUsername,
   typePassword,
+  otpApp,
   authorizeApp,
+  postLogin,
   options
 ) {
   validateOptions(options)
@@ -184,8 +204,16 @@ module.exports.baseLoginConnect = async function baseLoginConnect(
   await typeUsername({page, options})
   await typePassword({page, options})
 
+  if (typeof options.additionalSteps !== 'undefined') {
+    await options.additionalSteps({page, options})
+  }
+
+  if (options.otpSecret && otpApp) {
+    await otpApp({page, options})
+  }
+
   if (options.authorize) {
-    authorizeApp({page, options})
+    await authorizeApp({page, options})
   }
 
   // Switch back to Original Window
@@ -195,6 +223,10 @@ module.exports.baseLoginConnect = async function baseLoginConnect(
     }
     const pages = await browser.pages()
     page = pages[originalPageIndex]
+  }
+
+  if (options.postLoginClick) {
+    await postLogin({page, options})
   }
 
   if (options.cookieDelay) {
@@ -213,6 +245,8 @@ module.exports.baseLoginConnect = async function baseLoginConnect(
   }
 }
 
+module.exports.baseLoginConnect = baseLoginConnect
+
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   const typeUsername = async function({page, options} = {}) {
     await page.waitForSelector('input#identifierId[type="email"]')
@@ -230,7 +264,12 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
     await page.click(buttonSelector)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, null, options)
+  const postLogin = async function({page, options} = {}) {
+    await page.waitForSelector(options.postLoginClick)
+    await page.click(options.postLoginClick)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
 }
 
 module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}) {
@@ -250,7 +289,12 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
     await page.click('button#js-oauth-authorize-btn', options.password)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, authorizeApp, options)
+  const postLogin = async function({page, options} = {}) {
+    await page.waitForSelector(options.postLoginClick)
+    await page.click(options.postLoginClick)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, null, authorizeApp, postLogin, options)
 }
 
 module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(options = {}) {
@@ -273,5 +317,95 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
     await page.click('button#js-oauth-authorize-btn', options.password)
   }
 
-  return baseLoginConnect(typeUsername, typePassword, authorizeApp, options)
+  const postLogin = async function({page, options} = {}) {
+    await page.waitForSelector(options.postLoginClick)
+    await page.click(options.postLoginClick)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, null, authorizeApp, postLogin, options)
+}
+
+module.exports.AmazonSocialLogin = async function AmazonSocialLogin(options = {}) {
+  const typeUsername = async function({page, options} = {}) {
+    await page.waitForSelector('#ap_email', {visible: true})
+    await page.type('#ap_email', options.username)
+  }
+
+  const typePassword = async function({page, options} = {}) {
+    let buttonSelectors = ['#signInSubmit']
+
+    await page.waitForSelector('input[type="password"]', {visible: true})
+    await page.type('input[type="password"]', options.password)
+
+    const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
+    await page.click(buttonSelector)
+  }
+
+  const otpApp = async function({page, options} = {}) {
+    let buttonSelectors = ['#auth-signin-button']
+
+    await page.waitForSelector('#auth-mfa-otpcode', {visible: true})
+    await page.type('#auth-mfa-otpcode', authenticator.generate(options.otpSecret))
+
+    const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
+    await page.click(buttonSelector)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, otpApp, null, null, options)
+}
+
+module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options = {}) {
+  const typeUsername = async function({page, options} = {}) {
+    const emailSelector = '#email'
+    await page.waitForSelector(emailSelector)
+    await page.type(emailSelector, options.username)
+  }
+
+  const typePassword = async function({page, options} = {}) {
+    await page.waitForSelector('input[type="password"]', {visible: true})
+    await page.type('input[type="password"]', options.password)
+
+    // Submit first form
+    await page.click('#loginbutton input')
+
+    // Submit next form
+    const confirmBtnSelector = 'button[name="__CONFIRM__"]'
+    await page.waitForSelector(confirmBtnSelector)
+    await page.click(confirmBtnSelector)
+  }
+
+  const postLogin = async function({page, options} = {}) {
+    await page.waitForSelector(options.postLoginClick)
+    await page.click(options.postLoginClick)
+  }
+
+  return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
+}
+
+module.exports.CustomizedLogin = async function CustomizedLogin(options = {}) {
+  if (options.usernameField && options.passwordField) {
+    const typeUsername = async function({page, options} = {}) {
+      await page.waitForSelector(options.usernameField, {visible: true})
+      await page.type(options.usernameField, options.username)
+      if (options.usernameSubmitBtn) {
+        await page.click(options.usernameSubmitBtn)
+      }
+    }
+    const typePassword = async function({page, options} = {}) {
+      await page.waitForSelector(options.passwordField, {visible: true})
+      await page.type(options.passwordField, options.password)
+      if (options.passwordSubmitBtn) {
+        await page.click(options.passwordSubmitBtn)
+      }
+    }
+    const postLogin = async function({page, options} = {}) {
+      await page.waitForSelector(options.postLoginClick)
+      await page.click(options.postLoginClick)
+    }
+    return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
+  } else {
+    throw new Error(
+      'Please review your option properties. Propeties usernameField and passwordField are required as type String.'
+    )
+  }
 }
