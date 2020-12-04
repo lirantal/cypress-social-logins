@@ -29,6 +29,7 @@ const authenticator = require('otplib').authenticator
  * @param {options.passwordField} string selector for the password field
  * @param {options.passwordSubmitBtn} string selector password submit button
  * @param {options.additionalSteps} function any additional func which may be required for signin step after username and password
+ *
  */
 
 function delay(time) {

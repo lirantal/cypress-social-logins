@@ -85,7 +85,7 @@ Options passed to the task include:
 | preLoginSelector            | a selector to find and click on before clicking on the login button (useful for accepting cookies)                                | `'.ind-cbar-right button'`                     |
 | preLoginSelectorIframe      | string a selector to find a iframe for the preLoginSelector                                                                       | `'div#consent iframe'`                         |
 | preLoginSelectorIframeDelay | number delay a specific ms after click on the preLoginSelector. Pass a falsy (false, 0, null, undefined, '') to avoid completely. | 2000                                           |
-| otpSecret                   | Secret for generating a one-time password based on OTPLIB                                                                                       | `'SECRET'`                                     |
+| otpSecret                   | Secret for generating a one-time password based on OTPLIB                                                                         | `'SECRET'`                                     |
 | loginSelectorDelay          | delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely. | `100`                                          |
 | getAllBrowserCookies        | Whether to get all browser cookies instead of just ones with the domain of loginUrl                                               | true                                           |
 | isPopup                     | boolean, is your google auth displayed like a popup                                                                               | true                                           |
@@ -97,6 +97,7 @@ Options passed to the task include:
 | passwordField | Required for CustomizedLogin: string, a selector for the password field | | 
 | passwordSubmitBtn | Optional for CustomizedLogin: string, a selector for password submit button | |
 | additionalSteps             | Optional: function, to define any additional steps which may be required after executing functions for username and password, such as answering security questions, PIN, or anything which may be required to fill out after username and password process. The function and this property must be defined or referenced from index.js for Cypress Plugins directory. | `async function moreSteps({page, options} = {}) { await page.waitForSelector('#pin_Field') await page.click('#pin_Field')  }` |
+
 ## Install
 
 Install the plugin as a dependency
@@ -131,7 +132,7 @@ other configurations that need to be specified so that the task can navigate
 through the page properly.
 
 Once the task has completed it will return the list of cookies from the new
-page. Most likely that these cookies need to be set for the rest of the
+page. Most likely these cookies need to be set for the rest of the
 sessions in the test flow, hence the example code showing the case for
 `Cypress.Cookies.defaults`.
 
@@ -143,9 +144,9 @@ describe('Login', () => {
     const loginUrl = Cypress.env('loginUrl')
     const cookieName = Cypress.env('cookieName')
     const socialLoginOptions = {
-      username,
-      password,
-      loginUrl,
+      username: username,
+      password: password,
+      loginUrl: loginUrl,
       headless: true,
       logs: false,
       loginSelector: '[href="/auth/auth0/google-oauth2"]',
@@ -309,6 +310,47 @@ module.exports = (on, config) => {
 ```
 
 
+## Defining custom login
+
+When you need to use social logins which aren't supported by this plugin you can make use of the `baseLoginConnect()` function that is exported as part of the plugin like so:
+
+```js
+const { baseLoginConnect } = require('cypress-social-logins').plugins
+
+module.exports = (on, config) => {
+    on('task', {
+        customLogin(options) {
+            async function typeUsername({ page, options } = {
+            }) {
+                await page.waitForSelector('input[id="username"')
+                await page.type('input[id="username"', options.username)
+            }
+
+            async function typePassword({ page, options } = {
+            }) {
+                await page.waitForSelector('input[id="password"]')
+                await page.type('input[id="password"]', options.password)
+                await page.click('button[id="_submit"]')
+            }
+
+            return baseLoginConnect(typeUsername, typePassword, null, options);
+        }
+    })
+}
+```
+
+## Using AmazonSocialLogin with OneTimePassword
+
+You need an Amazon account with activated 2fa. The QR-Code is provided by Amazon and contains a SECRET to
+calculate an OTP. This is mandatory due the enforcement of 2fa of new amazon-accounts. SMS or E-Mail is not supported.
+You can extract the Secret from the QR-Code:
+```
+otpauth://totp/Amazon%3ASomeUser%40Example?secret=IBU3VLM........&issuer=Amazon
+```
+You need to set up the account in Amazon with GoogleAuthenticator or any password-manager which supports OTP. Further
+information here:
+https://www.amazon.com/gp/help/customer/display.html?nodeId=GE6SLZ5J9GCNRW44
+
 # Troubleshooting
 
 ## Timeout while trying to enter username
@@ -355,9 +397,9 @@ before(() => {
     const loginUrl = Cypress.env('loginUrl')
     const localStorageItem = Cypress.env('lsdItemName')
     const socialLoginOptions = {
-      username,
-      password,
-      loginUrl,
+      username: username,
+      password: password,
+      loginUrl: loginUrl,
       headless: true,
       logs: false,
       loginSelector: '[href="/auth/auth0/google-oauth2"]',
@@ -406,7 +448,7 @@ If you're getting an error message such as:
 Error: module not found: "ws" from file ..... node_modules/puppeteer/lib/WebSocketTransport.js #17
 ```
 
-It may be due to the fact that you're requiring one of the exported plugin functions, such as `GoogleSocialLogin` in your spec file in addition to requiring it in `cypress/plugins/index.js`. Remove it from your spec file.
+It may be due to the fact that you're requiring one of the exported plugin functions, such as `GoogleSocialLogin` in your spec file in addition to requiring it in `cypress/plugins/index.js`. Remove it from your spec file, or from a `support/index.js` and make sure you export the `GoogleSocialLogin` function as a task only from the `/plugins/index.js` file.
 
 See discussion about [in this issue](https://github.com/lirantal/cypress-social-logins/issues/17).
 
