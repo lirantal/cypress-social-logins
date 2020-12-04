@@ -24,6 +24,11 @@ const authenticator = require('otplib').authenticator
  * @param {options.popupDelay} number delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely
  * @param {options.cookieDelay} number delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null, undefined, '') to avoid completely.
  * @param {options.postLoginClick} string a selector to find and click on after clicking on the login button
+ * @param {options.usernameField} string selector for the username field
+ * @param {options.usernameSubmitBtn} string selector for the username button
+ * @param {options.passwordField} string selector for the password field
+ * @param {options.passwordSubmitBtn} string selector password submit button
+ * @param {options.additionalSteps} function any additional func which may be required for signin step after username and password
  *
  */
 
@@ -200,6 +205,10 @@ async function baseLoginConnect(
   await typeUsername({page, options})
   await typePassword({page, options})
 
+  if (typeof options.additionalSteps !== 'undefined') {
+    await options.additionalSteps({page, options})
+  }
+
   if (options.otpSecret && otpApp) {
     await otpApp({page, options})
   }
@@ -372,4 +381,32 @@ module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options 
   }
 
   return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
+}
+
+module.exports.CustomizedLogin = async function CustomizedLogin(options = {}) {
+  if (options.usernameField && options.passwordField) {
+    const typeUsername = async function({page, options} = {}) {
+      await page.waitForSelector(options.usernameField, {visible: true})
+      await page.type(options.usernameField, options.username)
+      if (options.usernameSubmitBtn) {
+        await page.click(options.usernameSubmitBtn)
+      }
+    }
+    const typePassword = async function({page, options} = {}) {
+      await page.waitForSelector(options.passwordField, {visible: true})
+      await page.type(options.passwordField, options.password)
+      if (options.passwordSubmitBtn) {
+        await page.click(options.passwordSubmitBtn)
+      }
+    }
+    const postLogin = async function({page, options} = {}) {
+      await page.waitForSelector(options.postLoginClick)
+      await page.click(options.postLoginClick)
+    }
+    return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
+  } else {
+    throw new Error(
+      'Please review your option properties. Propeties usernameField and passwordField are required as type String.'
+    )
+  }
 }

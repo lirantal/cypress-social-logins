@@ -92,6 +92,11 @@ Options passed to the task include:
 | popupDelay                  | number, delay a specific milliseconds before popup is shown. Pass a falsy (false, 0, null, undefined, '') to avoid completely     | 2000                                           |
 | cookieDelay                 | number, delay a specific milliseconds before get a cookies. Pass a falsy (false, 0, null,undefined,'') to avoid completely        | 100                                            |
 | postLoginClick              | Optional: a selector to find and click on after clicking on the login button                                                                | `#idSIButton9`                                 |
+| usernameField   | Required for CustomizedLogin: string, a selector for the username field | |
+| usernameSubmitBtn | Optional for CustomizedLogin: string, a selector for the username button  | | 
+| passwordField | Required for CustomizedLogin: string, a selector for the password field | | 
+| passwordSubmitBtn | Optional for CustomizedLogin: string, a selector for password submit button | |
+| additionalSteps             | Optional: function, to define any additional steps which may be required after executing functions for username and password, such as answering security questions, PIN, or anything which may be required to fill out after username and password process. The function and this property must be defined or referenced from index.js for Cypress Plugins directory. | `async function moreSteps({page, options} = {}) { await page.waitForSelector('#pin_Field') await page.click('#pin_Field')  }` |
 
 ## Install
 
@@ -144,7 +149,7 @@ describe('Login', () => {
       loginUrl: loginUrl,
       headless: true,
       logs: false,
-      loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
+      loginSelector: '[href="/auth/auth0/google-oauth2"]',
       postLoginSelector: '.account-panel'
     }
 
@@ -169,6 +174,141 @@ describe('Login', () => {
   })
 })
 ```
+## Defining custom login
+1 Alternative
+When you need to use social logins which aren't supported by this plugin you can make use of the `baseLoginConnect()` function that is exported as part of the plugin like so:
+
+```js
+const { baseLoginConnect } = require('cypress-social-logins').plugins
+
+module.exports = (on, config) => {
+    on('task', {
+        customLogin(options) {
+            async function typeUsername({ page, options } = {
+            }) {
+                await page.waitForSelector('input[id="username"]')
+                await page.type('input[id="username"]', options.username)
+            }
+
+            async function typePassword({ page, options } = {
+            }) {
+                await page.waitForSelector('input[id="password"]')
+                await page.type('input[id="password"]', options.password)
+                await page.click('button[id="_submit"]')
+            }
+
+            return baseLoginConnect(typeUsername, typePassword, null, options);
+        }
+    })
+}
+```
+2 Alternative 
+You can also use the `CustomizedLogin` function and just provide the selectors inside the `options` object to pass into the function. Properties `usernameField` and `passwordField` are required, otherwise the function will throw an Error with a message for requirements. Properties `usernameSubmitBtn` and `passwordSubmitBtn`  are optional. (It is recommended to define passwordSubmitBtn to help proceed login flow.)
+
+Test file -
+```js
+describe('Login', () => {
+  it('Login through Google', () => {
+    const username = Cypress.env('googleSocialLoginUsername')
+    const password = Cypress.env('googleSocialLoginPassword')
+    const loginUrl = Cypress.env('loginUrl')
+    const cookieName = Cypress.env('cookieName')
+    const socialLoginOptions = {
+      username,
+      password,
+      loginUrl,
+      usernameField: '#input_username',
+      passwordFiedl: '#input_password',
+      passwordSubmitBtn: '#login_btn_sign',
+      headless: true,
+      logs: false,
+      loginSelector: '[href="/auth/auth0/google-oauth2"]',
+      postLoginSelector: '.account-panel'
+    }
+
+    return cy.task('GoogleSocialLogin', socialLoginOptions).then(({cookies}) => {
+      cy.clearCookies()
+
+      const cookie = cookies.filter(cookie => cookie.name === cookieName).pop()
+      if (cookie) {
+        cy.setCookie(cookie.name, cookie.value, {
+          domain: cookie.domain,
+          expiry: cookie.expires,
+          httpOnly: cookie.httpOnly,
+          path: cookie.path,
+          secure: cookie.secure
+        })
+
+        Cypress.Cookies.defaults({
+          preserve: cookieName
+        })
+      }
+    })
+  })
+})
+```
+Plugns - 
+
+```js
+/**
+ * @type {Cypress.PluginConfig}
+ */
+const {CustomizedLogin} = require('cypress-social-logins').plugins
+
+module.exports = (on, config) => {
+  // `on` is used to hook into various events Cypress emits
+  // `config` is the resolved Cypress config
+  on('task', {
+    customizedLogin: (options) => {
+      return CustomizedLogin(options)
+    }
+  }
+  )
+}
+
+```
+
+
+## Using AmazonSocialLogin with OneTimePassword
+
+You need an Amazon account with activated 2fa. The QR-Code is provided by Amazon and contains a SECRET to
+calculate an OTP. This is mandatory due the enforcement of 2fa of new amazon-accounts. SMS or E-Mail is not supported.
+You can extract the Secret from the QR-Code:
+```
+otpauth://totp/Amazon%3ASomeUser%40Example?secret=IBU3VLM........&issuer=Amazon
+```
+You need to set up the account in Amazon with GoogleAuthenticator or any password-manager which supports OTP. Further
+information here:
+https://www.amazon.com/gp/help/customer/display.html?nodeId=GE6SLZ5J9GCNRW44
+
+
+## Adding AdditionalSteps to login work flow
+
+If there more steps to your login work-flow after submitting username and pass, you can define your functions for these extra steps, then assign them to the `options.additionalSteps` property in Cypress plugins file.
+
+```js
+/**
+ * @type {Cypress.PluginConfig}
+ */
+async function fewMoreSteps({page, options} = {}){
+  // ... define steps
+}
+
+module.exports = (on, config) => {
+  // `on` is used to hook into various events Cypress emits
+  // `config` is the resolved Cypress config
+  on('task', {
+    customizedLogin: (options) => {
+
+      options.additionalSteps = fewMoreSteps
+      
+      return CustomizedLogin(options)
+    }
+  }
+  )
+}
+```
+
 
 ## Defining custom login
 
@@ -219,6 +359,14 @@ Make sure you are providing the plugin with the username or password in the opti
 
 If your application uses popup auth, make sure you are providing `isPopup: true` configuration parameter.
 
+## Timeout error with Selectors
+
+Puppeteer uses `document.querySelectors`. If you use selectors such as jQuery, you might face timeout errors because Puppeteer may not understand. 
+
+You can check these links to get examples for valid selectors:
+[document.querySelector()](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+[CSS Selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
+
 ## Failed to launch the browser process
 
 If you're getting an error on a Linux server such as:
@@ -254,7 +402,7 @@ before(() => {
       loginUrl: loginUrl,
       headless: true,
       logs: false,
-      loginSelector: 'a[href="/auth/auth0/google-oauth2"]',
+      loginSelector: '[href="/auth/auth0/google-oauth2"]',
       postLoginSelector: '.account-panel'
     }
 
@@ -307,6 +455,44 @@ See discussion about [in this issue](https://github.com/lirantal/cypress-social-
 ## Amazon OTP not accepted
 
 Please be aware of proper time on your machine. Make sure you are using ntp to be in sync.
+
+## additionalSteps not a function
+
+Please avoid defining your additionalSteps function inside your test file. It will cause errors when you pass your `options` object through `cy.task()`. 
+
+If you also have cases with multiple scenarios, such as having both cases to enter PIN or secuirty after password or enter usual username and password login flow without extra steps, you can add a property in the `options` object as an indicater which additional functions you wish to apply. 
+
+Example:
+```js
+/**
+ * @type {Cypress.PluginConfig}
+ */
+async function fewMoreStepsPin({page, options} = {}){
+  // ... define steps to enter PIN 
+}
+
+async function fewMoreStepsSecurityQ({page, option} = {}){
+  // ... define steps to enter secuirty question
+}
+
+module.exports = (on, config) => {
+  // `on` is used to hook into various events Cypress emits
+  // `config` is the resolved Cypress config
+  on('task', {
+    customizedLogin: (options) => {
+      if (options.moreSteps === 'pin') {
+        // assign options.addtionalSteps pin function
+        options.additionalSteps = fewMoreStepsPin
+      } else if (options.moreSteps === 'securityQ') {
+        // assign options.additionalSteps securityQ
+        options.additionalSteps = fewMoreStepsSecurityQ
+      }
+      return CustomizedLogin(options)
+    }
+  }
+  )
+}
+```
 
 # Author
 
