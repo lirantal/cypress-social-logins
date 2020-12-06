@@ -369,10 +369,14 @@ module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options 
     // Submit first form
     await page.click('#loginbutton input')
 
-    // Submit next form
-    const confirmBtnSelector = 'button[name="__CONFIRM__"]'
-    await page.waitForSelector(confirmBtnSelector)
-    await page.click(confirmBtnSelector)
+    try {
+      // Submit next form
+      const confirmBtnSelector = 'button[name="__CONFIRM__"]'
+      await page.waitForSelector(confirmBtnSelector)
+      await page.click(confirmBtnSelector)
+    } catch (e) {
+      // Isn't always presented by Facebook
+    }
   }
 
   const postLogin = async function({page, options} = {}) {
