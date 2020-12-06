@@ -25,8 +25,9 @@ npm run test
 
 ### Commit Guidelines
 
-The project uses the commitizen tool for standardizing changelog style commit
-messages so you should follow it as so:
+This project uses the [Commitizen](https://github.com/commitizen/cz-cli) tool
+for standardizing changelog-style commit messages, so you should follow it as
+so:
 
 ```bash
 git add .           # add files to staging
