@@ -367,7 +367,7 @@ module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options 
     await page.type('input[type="password"]', options.password)
 
     // Submit first form
-    await page.click('#loginbutton input')
+    await page.click('#loginbutton')
 
     try {
       // Submit next form
