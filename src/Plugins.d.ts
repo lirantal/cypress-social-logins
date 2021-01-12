@@ -28,7 +28,7 @@ export declare function CustomizedLogin(options?: {}): Promise<{
     lsd: any;
     ssd: any;
 }>;
-export declare function baseLoginConnect(typeUsername: any, typePassword: any, otpApp: any, authorizeApp: any, postLogin: any, options: any): Promise<{
+export declare function baseLoginConnect(typeUsername: function, typePassword: function, otpApp: function | null, authorizeApp: function | null, postLogin: function, options: {}): Promise<{
     cookies: any;
     lsd: any;
     ssd: any;
