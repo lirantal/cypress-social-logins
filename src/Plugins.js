@@ -59,13 +59,15 @@ async function login({page, options} = {}) {
     }
   }
 
-  await page.waitForSelector(options.loginSelector)
+  if (options.loginSelector) {
+    await page.waitForSelector(options.loginSelector)
 
-  if (options.loginSelectorDelay !== false) {
-    await delay(options.loginSelectorDelay)
+    if (options.loginSelectorDelay !== false) {
+      await delay(options.loginSelectorDelay)
+    }
+
+    await page.click(options.loginSelector)
   }
-
-  await page.click(options.loginSelector)
 }
 
 async function getCookies({page, options} = {}) {
