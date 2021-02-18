@@ -15,6 +15,15 @@
   <a href="https://github.com/nodejs/security-wg/blob/master/processes/responsible_disclosure_template.md"><img src="https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow.svg" alt="Security Responsible Disclosure" /></a>
 </p>
 
+<p align="center">
+  ** Disclaimer and limitations **
+</p>
+
+<p align="center">
+This plugin doesn't work well in a CI environment, due to the anti-fraud detection mechanisms employed by the likes of Google, GitHub etc. Why? If you attempt to login from a CI machine which has different IPs, geolocation and other fingerprint identification which the account you use isn't normally attempting a login from, then this will trigger Multi Factor Authentication, CAPTCHA, or other means of confirming the identity. When those extra steps are needed, this plugin doesn't work well around them.
+</p>
+
+
 # About
 
 This Cypress library makes it possible to perform third-party logins (think oauth) for services such as GitHub, Google or Facebook.
