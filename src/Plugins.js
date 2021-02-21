@@ -51,8 +51,8 @@ function takeScreenshot(options) {
     if (!fs.existsSync('./cypress/screenshots/cypresssociallogin/')) {
       fs.mkdirSync('./cypress/screenshots/cypresssociallogin/', {recursive: true})
     }
+    page.screenshot({path: `'./cypress/screenshots/cypresssociallogin/SocialLoginError.png`})
   }
-  page.screenshot({path: `'./cypress/screenshots/cypresssociallogin/socialLoginError.png`})
 }
 
 async function login({page, options} = {}) {
