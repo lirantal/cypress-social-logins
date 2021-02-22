@@ -3,6 +3,7 @@
 
 const puppeteer = require('puppeteer')
 const authenticator = require('otplib').authenticator
+const fs = require('fs')
 
 /**
  *
@@ -29,6 +30,7 @@ const authenticator = require('otplib').authenticator
  * @param {options.passwordField} string selector for the password field
  * @param {options.passwordSubmitBtn} string selector password submit button
  * @param {options.additionalSteps} function any additional func which may be required for signin step after username and password
+ * @param {options.screenshotOnError} boolean grab a screenshot if an error occurs during username, password, or post-login page
  *
  */
 
@@ -41,6 +43,15 @@ function delay(time) {
 function validateOptions(options) {
   if (!options.username || !options.password) {
     throw new Error('Username or Password missing for social login')
+  }
+}
+
+function takeScreenshot(options) {
+  if (options.screenshotOnError) {
+    if (!fs.existsSync('./cypress/screenshots/cypresssociallogin/')) {
+      fs.mkdirSync('./cypress/screenshots/cypresssociallogin/', {recursive: true})
+    }
+    page.screenshot({path: `'./cypress/screenshots/cypresssociallogin/SocialLoginError.png`})
   }
 }
 
@@ -252,24 +263,39 @@ module.exports.baseLoginConnect = baseLoginConnect
 
 module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}) {
   const typeUsername = async function({page, options} = {}) {
-    await page.waitForSelector('input#identifierId[type="email"]')
-    await page.type('input#identifierId[type="email"]', options.username)
-    await page.click('#identifierNext')
+    try {
+      await page.waitForSelector('input#identifierId[type="email"]')
+      await page.type('input#identifierId[type="email"]', options.username)
+      await page.click('#identifierNext')
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const typePassword = async function({page, options} = {}) {
-    let buttonSelectors = ['#signIn', '#passwordNext', '#submit']
+    try {
+      let buttonSelectors = ['#signIn', '#passwordNext', '#submit']
 
-    await page.waitForSelector('input[type="password"]', {visible: true})
-    await page.type('input[type="password"]', options.password)
+      await page.waitForSelector('input[type="password"]', {visible: true})
+      await page.type('input[type="password"]', options.password)
 
-    const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
-    await page.click(buttonSelector)
+      const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
+      await page.click(buttonSelector)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const postLogin = async function({page, options} = {}) {
-    await page.waitForSelector(options.postLoginClick)
-    await page.click(options.postLoginClick)
+    try {
+      await page.waitForSelector(options.postLoginClick)
+      await page.click(options.postLoginClick)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
@@ -277,14 +303,24 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
 
 module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}) {
   const typeUsername = async function({page, options} = {}) {
-    await page.waitForSelector('input#login_field')
-    await page.type('input#login_field', options.username)
+    try {
+      await page.waitForSelector('input#login_field')
+      await page.type('input#login_field', options.username)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const typePassword = async function({page, options} = {}) {
-    await page.waitForSelector('input#password', {visible: true})
-    await page.type('input#password', options.password)
-    await page.click('input[type="submit"]')
+    try {
+      await page.waitForSelector('input#password', {visible: true})
+      await page.type('input#password', options.password)
+      await page.click('input[type="submit"]')
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const authorizeApp = async function({page, options} = {}) {
@@ -293,8 +329,13 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
   }
 
   const postLogin = async function({page, options} = {}) {
-    await page.waitForSelector(options.postLoginClick)
-    await page.click(options.postLoginClick)
+    try {
+      await page.waitForSelector(options.postLoginClick)
+      await page.click(options.postLoginClick)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   return baseLoginConnect(typeUsername, typePassword, null, authorizeApp, postLogin, options)
@@ -302,17 +343,27 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
 
 module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(options = {}) {
   const typeUsername = async function({page, options} = {}) {
-    await page.waitForSelector('input[type="email"]')
-    await page.type('input[type="email"]', options.username)
-    await page.click('input[type="submit"]')
+    try {
+      await page.waitForSelector('input[type="email"]')
+      await page.type('input[type="email"]', options.username)
+      await page.click('input[type="submit"]')
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const typePassword = async function({page, options} = {}) {
-    await delay(5000)
+    try {
+      await delay(5000)
 
-    await page.waitForSelector('input[type="password"]', {visible: true})
-    await page.type('input[type="password"]', options.password)
-    await page.click('input[type="submit"]')
+      await page.waitForSelector('input[type="password"]', {visible: true})
+      await page.type('input[type="password"]', options.password)
+      await page.click('input[type="submit"]')
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const authorizeApp = async function({page, options} = {}) {
@@ -321,8 +372,13 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
   }
 
   const postLogin = async function({page, options} = {}) {
-    await page.waitForSelector(options.postLoginClick)
-    await page.click(options.postLoginClick)
+    try {
+      await page.waitForSelector(options.postLoginClick)
+      await page.click(options.postLoginClick)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   return baseLoginConnect(typeUsername, typePassword, null, authorizeApp, postLogin, options)
@@ -330,18 +386,28 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
 
 module.exports.AmazonSocialLogin = async function AmazonSocialLogin(options = {}) {
   const typeUsername = async function({page, options} = {}) {
-    await page.waitForSelector('#ap_email', {visible: true})
-    await page.type('#ap_email', options.username)
+    try {
+      await page.waitForSelector('#ap_email', {visible: true})
+      await page.type('#ap_email', options.username)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const typePassword = async function({page, options} = {}) {
     let buttonSelectors = ['#signInSubmit']
 
-    await page.waitForSelector('input[type="password"]', {visible: true})
-    await page.type('input[type="password"]', options.password)
+    try {
+      await page.waitForSelector('input[type="password"]', {visible: true})
+      await page.type('input[type="password"]', options.password)
 
-    const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
-    await page.click(buttonSelector)
+      const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
+      await page.click(buttonSelector)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const otpApp = async function({page, options} = {}) {
@@ -359,17 +425,27 @@ module.exports.AmazonSocialLogin = async function AmazonSocialLogin(options = {}
 
 module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options = {}) {
   const typeUsername = async function({page, options} = {}) {
-    const emailSelector = '#email'
-    await page.waitForSelector(emailSelector)
-    await page.type(emailSelector, options.username)
+    try {
+      const emailSelector = '#email'
+      await page.waitForSelector(emailSelector)
+      await page.type(emailSelector, options.username)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   const typePassword = async function({page, options} = {}) {
-    await page.waitForSelector('input[type="password"]', {visible: true})
-    await page.type('input[type="password"]', options.password)
+    try {
+      await page.waitForSelector('input[type="password"]', {visible: true})
+      await page.type('input[type="password"]', options.password)
 
-    // Submit first form
-    await page.click('#loginbutton')
+      // Submit first form
+      await page.click('#loginbutton')
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
 
     try {
       // Submit next form
@@ -382,8 +458,13 @@ module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options 
   }
 
   const postLogin = async function({page, options} = {}) {
-    await page.waitForSelector(options.postLoginClick)
-    await page.click(options.postLoginClick)
+    try {
+      await page.waitForSelector(options.postLoginClick)
+      await page.click(options.postLoginClick)
+    } catch (err) {
+      takeScreenshot(options)
+      throw err
+    }
   }
 
   return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
@@ -392,22 +473,37 @@ module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options 
 module.exports.CustomizedLogin = async function CustomizedLogin(options = {}) {
   if (options.usernameField && options.passwordField) {
     const typeUsername = async function({page, options} = {}) {
-      await page.waitForSelector(options.usernameField, {visible: true})
-      await page.type(options.usernameField, options.username)
-      if (options.usernameSubmitBtn) {
-        await page.click(options.usernameSubmitBtn)
+      try {
+        await page.waitForSelector(options.usernameField, {visible: true})
+        await page.type(options.usernameField, options.username)
+        if (options.usernameSubmitBtn) {
+          await page.click(options.usernameSubmitBtn)
+        }
+      } catch (err) {
+        takeScreenshot(options)
+        throw err
       }
     }
     const typePassword = async function({page, options} = {}) {
-      await page.waitForSelector(options.passwordField, {visible: true})
-      await page.type(options.passwordField, options.password)
-      if (options.passwordSubmitBtn) {
-        await page.click(options.passwordSubmitBtn)
+      try {
+        await page.waitForSelector(options.passwordField, {visible: true})
+        await page.type(options.passwordField, options.password)
+        if (options.passwordSubmitBtn) {
+          await page.click(options.passwordSubmitBtn)
+        }
+      } catch (err) {
+        takeScreenshot(options)
+        throw err
       }
     }
     const postLogin = async function({page, options} = {}) {
-      await page.waitForSelector(options.postLoginClick)
-      await page.click(options.postLoginClick)
+      try {
+        await page.waitForSelector(options.postLoginClick)
+        await page.click(options.postLoginClick)
+      } catch (err) {
+        takeScreenshot(options)
+        throw err
+      }
     }
     return baseLoginConnect(typeUsername, typePassword, null, null, postLogin, options)
   } else {
