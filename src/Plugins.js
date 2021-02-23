@@ -46,7 +46,7 @@ function validateOptions(options) {
   }
 }
 
-function takeScreenshot(options) {
+function takeScreenshot(page, options) {
   if (options.screenshotOnError) {
     if (!fs.existsSync('./cypress/screenshots/cypresssociallogin/')) {
       fs.mkdirSync('./cypress/screenshots/cypresssociallogin/', {recursive: true})
@@ -268,7 +268,7 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
       await page.type('input#identifierId[type="email"]', options.username)
       await page.click('#identifierNext')
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -283,7 +283,7 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
       const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
       await page.click(buttonSelector)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -293,7 +293,7 @@ module.exports.GoogleSocialLogin = async function GoogleSocialLogin(options = {}
       await page.waitForSelector(options.postLoginClick)
       await page.click(options.postLoginClick)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -307,7 +307,7 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
       await page.waitForSelector('input#login_field')
       await page.type('input#login_field', options.username)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -318,7 +318,7 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
       await page.type('input#password', options.password)
       await page.click('input[type="submit"]')
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -333,7 +333,7 @@ module.exports.GitHubSocialLogin = async function GitHubSocialLogin(options = {}
       await page.waitForSelector(options.postLoginClick)
       await page.click(options.postLoginClick)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -348,7 +348,7 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
       await page.type('input[type="email"]', options.username)
       await page.click('input[type="submit"]')
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -361,7 +361,7 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
       await page.type('input[type="password"]', options.password)
       await page.click('input[type="submit"]')
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -376,7 +376,7 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
       await page.waitForSelector(options.postLoginClick)
       await page.click(options.postLoginClick)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -390,7 +390,7 @@ module.exports.AmazonSocialLogin = async function AmazonSocialLogin(options = {}
       await page.waitForSelector('#ap_email', {visible: true})
       await page.type('#ap_email', options.username)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -405,7 +405,7 @@ module.exports.AmazonSocialLogin = async function AmazonSocialLogin(options = {}
       const buttonSelector = await waitForMultipleSelectors(buttonSelectors, {visible: true}, page)
       await page.click(buttonSelector)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -430,7 +430,7 @@ module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options 
       await page.waitForSelector(emailSelector)
       await page.type(emailSelector, options.username)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -443,7 +443,7 @@ module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options 
       // Submit first form
       await page.click('#loginbutton')
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
 
@@ -462,7 +462,7 @@ module.exports.FacebookSocialLogin = async function FacebookSocialLogin(options 
       await page.waitForSelector(options.postLoginClick)
       await page.click(options.postLoginClick)
     } catch (err) {
-      takeScreenshot(options)
+      takeScreenshot(page, options)
       throw err
     }
   }
@@ -480,7 +480,7 @@ module.exports.CustomizedLogin = async function CustomizedLogin(options = {}) {
           await page.click(options.usernameSubmitBtn)
         }
       } catch (err) {
-        takeScreenshot(options)
+        takeScreenshot(page, options)
         throw err
       }
     }
@@ -492,7 +492,7 @@ module.exports.CustomizedLogin = async function CustomizedLogin(options = {}) {
           await page.click(options.passwordSubmitBtn)
         }
       } catch (err) {
-        takeScreenshot(options)
+        takeScreenshot(page, options)
         throw err
       }
     }
@@ -501,7 +501,7 @@ module.exports.CustomizedLogin = async function CustomizedLogin(options = {}) {
         await page.waitForSelector(options.postLoginClick)
         await page.click(options.postLoginClick)
       } catch (err) {
-        takeScreenshot(options)
+        takeScreenshot(page, options)
         throw err
       }
     }
