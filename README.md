@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  ** <strong>DISCLAIMER and LIMITATIONS</strong> **
+  ** <strong> ⚠️  DISCLAIMER and LIMITATIONS  ⚠️ </strong> **
 </p>
 
 <p align="center">
