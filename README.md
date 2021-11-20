@@ -107,6 +107,7 @@ Options passed to the task include:
 | passwordSubmitBtn | Optional for CustomizedLogin: string, a selector for password submit button | |
 | screenshotOnError | Optional: will grab a screen shot if an error occurs on the username, password, or post-login page and saves in the Cypress screenshots folder.     | false |
 | additionalSteps             | Optional: function, to define any additional steps which may be required after executing functions for username and password, such as answering security questions, PIN, or anything which may be required to fill out after username and password process. The function and this property must be defined or referenced from index.js for Cypress Plugins directory. | `async function moreSteps({page, options} = {}) { await page.waitForSelector('#pin_Field') await page.click('#pin_Field')  }` |
+| trackingConsentSelectors  | Optional: selectors to find and click on after clicking the login button, but before entering details on the third-party site (useful for accepting third-party cookies e.g. Facebook login). Provide multiple if wanting to accept only essential cookies and it requires multiple clicks |  `['button[data-testid="cookie-policy-dialog-manage-button"]', 'button-data-testid="cookie-policy-manage-dialog-accept-button"]']` |
 
 ## Install
 
