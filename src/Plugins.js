@@ -31,6 +31,7 @@ const fs = require('fs')
  * @param {options.passwordSubmitBtn} string selector password submit button
  * @param {options.additionalSteps} function any additional func which may be required for signin step after username and password
  * @param {options.screenshotOnError} boolean grab a screenshot if an error occurs during username, password, or post-login page
+ * @param {options.trackingConsentSelectors} array[string] selectors to find and click on before entering details on the third-party site (useful for accepting third-party cookies)
  *
  */
 
@@ -213,6 +214,14 @@ async function baseLoginConnect(
       pages.find(p => page._target._targetId === p._target._targetId)
     )
     page = pages[pages.length - 1]
+  }
+
+  // Accept third-party cookies if required
+  if (options.trackingConsentSelectors !== undefined) {
+    for (const selector of options.trackingConsentSelectors) {
+      await page.waitForSelector(selector)
+      await page.click(selector)
+    }
   }
 
   await typeUsername({page, options})
