@@ -86,6 +86,7 @@ Options passed to the task include:
 | username                    |                                                                                                                                   |
 | password                    |                                                                                                                                   |
 | loginUrl                    | The URL for the login page that includes the social network buttons                                                               | https://www.example.com/login                  |
+| loginUrlCredentials         | Basic Authentication credentials for the `loginUrl`                                                                               | `{username: user, password: demo}`             |
 | args                        | string array which allows providing further arguments to puppeteer                                                                | `['--no-sandbox', '--disable-setuid-sandbox']` |
 | headless                    | Whether to run puppeteer in headless mode or not                                                                                  | true                                           |
 | logs                        | Whether to log interaction with the loginUrl website & cookie data                                                                | false                                          |
