@@ -10,6 +10,7 @@ const fs = require('fs')
  * @param {options.username} string username
  * @param {options.password} string password
  * @param {options.loginUrl} string password
+ * @param {options.loginUrlCredentials} Object Basic Authentication credentials for the `loginUrl`
  * @param {options.args} array[string] string array which allows providing further arguments to puppeteer
  * @param {options.loginSelector} string a selector on the loginUrl page for the social provider button
  * @param {options.loginSelectorDelay} number delay a specific amount of time before clicking on the login button, defaults to 250ms. Pass a boolean false to avoid completely.
@@ -199,7 +200,9 @@ async function baseLoginConnect(
   await page.setUserAgent(
     'Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36'
   )
-
+  if (options.loginUrlCredentials) {
+    await page.authenticate(options.loginUrlCredentials)
+  }
   await page.goto(options.loginUrl)
   await login({page, options})
 
