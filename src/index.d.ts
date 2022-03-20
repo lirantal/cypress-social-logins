@@ -1,5 +1,5 @@
-import * as Plugins from "./Plugins";
+import * as plugins from "./Plugins";
 
 declare module "cypress-social-logins" {
-    export {Plugins}
+    export { plugins };
 }
