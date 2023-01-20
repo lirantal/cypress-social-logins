@@ -10,7 +10,7 @@
   <a href="https://www.npmjs.org/package/cypress-social-logins"><img src="https://badgen.net/npm/v/cypress-social-logins" alt="npm version"/></a>
   <a href="https://www.npmjs.org/package/cypress-social-logins"><img src="https://badgen.net/npm/license/cypress-social-logins" alt="license"/></a>
   <a href="https://www.npmjs.org/package/cypress-social-logins"><img src="https://badgen.net/npm/dt/cypress-social-logins" alt="downloads"/></a>
-  <a href="https://circleci.com/gh/lirantal/cypress-social-logins"><img src="https://circleci.com/gh/lirantal/cypress-social-logins.svg?style=svg" alt="build"/></a>
+  <a href="https://github.com/lirantal/cypress-social-logins/actions/workflows/main.yml"><img src="https://github.com/lirantal/cypress-social-logins/actions/workflows/main.yml/badge.svg" alt="build"/></a>
   <a href="https://snyk.io/test/github/lirantal/cypress-social-logins"><img src="https://snyk.io/test/github/lirantal/cypress-social-logins/badge.svg" alt="Known Vulnerabilities"/></a>
   <a href="https://github.com/nodejs/security-wg/blob/master/processes/responsible_disclosure_template.md"><img src="https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow.svg" alt="Security Responsible Disclosure" /></a>
 </p>
