@@ -35,3 +35,6 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run semantic-release
+        env:
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            NPM_TOKEN: ${{secrets.NPM_TOKEN}}
