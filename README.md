@@ -225,7 +225,7 @@ describe('Login', () => {
       password,
       loginUrl,
       usernameField: '#input_username',
-      passwordFiedl: '#input_password',
+      passwordField: '#input_password',
       passwordSubmitBtn: '#login_btn_sign',
       headless: true,
       logs: false,
