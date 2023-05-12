@@ -21,6 +21,10 @@
     "email": "liran.tal@gmail.com",
     "url": "https://github.com/lirantal"
   },
+  "publishConfig": {
+    "provenance": true,
+    "access": "public"
+  },
   "license": "Apache-2.0",
   "keywords": [
     "cypress",
