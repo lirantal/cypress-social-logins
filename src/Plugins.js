@@ -363,6 +363,13 @@ module.exports.MicrosoftSocialLogin = async function MicrosoftSocialLogin(option
   const typeUsername = async function({page, options} = {}) {
     try {
       await page.waitForSelector('input[type="email"]')
+
+      // custom code to get rid of the "none" text within the login input field
+      const input = await page.$('input[type="email"]')
+      await input.click({clickCount: 3})
+      await input.type('')
+      // ======================================================================
+
       await page.type('input[type="email"]', options.username)
       await page.click('input[type="submit"]')
     } catch (err) {
