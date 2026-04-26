@@ -29,10 +29,11 @@ jobs:
       id-token: write # to enable use of OIDC for npm provenance
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          cache: 'npm'
+          node-version: '24'
+          cache: npm
       - run: npm ci
       - run: npm run semantic-release
         env:
